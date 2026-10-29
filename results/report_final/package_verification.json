@@ -1,12 +1,12 @@
 {
   "status": "pass",
   "zip_filename": "ECG_project_code.zip",
-  "bytes": 18068968,
-  "sha256": "18cdaeedf156d8ceb750ef1eecdd7fd320906f23700649f2d8d31b05e585ae05",
+  "bytes": 18070830,
+  "sha256": "3101f636870f26d21fd4c3b5a75d22456a7e3fb3d55495cd8793a41f1665fe1d",
   "entry_count": 153,
-  "docx_sha256": "32f221c7a9ca7c1426c6cd79f895d9ea725cc21e668fcfb154d47ed7c061586f",
+  "docx_sha256": "b76cde9a0014dc3c7a038cee949d3f879b03d6c81f6bf5ff21248ffd87c84389",
   "pdf": {
-    "sha256": "30e933044f4bc81d6fa57df951e1cc30b21885b7aed2d7de31eedc933a41682e",
+    "sha256": "6dc0bb63af4bb9334f370461d16d4a022d02a655bfb453064e7c8215e0e1d27d",
     "pages": 17
   },
   "all_entries_verified": true,

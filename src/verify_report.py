@@ -34,6 +34,7 @@ NS = {
     'dcterms':'http://purl.org/dc/terms/',
 }
 CLASS_NAMES = ('N','S','V','F')
+REPOSITORY_URL = 'https://github.com/HZH507/openecg-beat-screening'
 KNOWN_DS2 = {'N':44259,'S':1837,'V':3221,'F':388}
 EXPECTED_TOTALS = [(21,49050),(22,49705),(1,1963),(4,733),(48,101451)]
 
@@ -1037,6 +1038,40 @@ def verify_synthetic_demo(root,manifest,summary,paragraphs,audit):
             'prediction_inference_performed':False}
 
 
+def verify_repository_hyperlink(blobs,document,audit):
+    """Require a real external OOXML link in appendix B, not URL-looking text."""
+    relationships=ET.fromstring(blobs['word/_rels/document.xml.rels'])
+    by_id={node.attrib['Id']:node.attrib for node in relationships}
+    appendix=False
+    found=[]
+    for node in document.find('w:body',NS):
+        if compact(element_text(node)).startswith('附录B'):
+            appendix=True
+        if not appendix:
+            continue
+        for link in node.findall('.//w:hyperlink',NS):
+            rel=by_id.get(link.attrib.get(f"{{{NS['r']}}}id"),{})
+            if rel.get('Target')==REPOSITORY_URL:
+                audit.equal(rel.get('TargetMode'),'External','repository hyperlink relationship is external')
+                audit.equal(rel.get('Type'),NS['r']+'/hyperlink','repository hyperlink relationship type')
+                audit.equal(element_text(link),REPOSITORY_URL,'repository hyperlink display text matches destination')
+                found.append(link)
+    audit.equal(len(found),1,'appendix B contains one genuine repository hyperlink')
+    return {'target':REPOSITORY_URL,'external_hyperlinks_in_appendix_B':len(found)}
+
+
+def pdf_uri_links(page):
+    links=[]
+    for ref in page.get('/Annots',[]):
+        annotation=ref.get_object()
+        action=annotation.get('/A')
+        action=action.get_object() if action is not None else {}
+        if annotation.get('/Subtype')=='/Link' and action.get('/S')=='/URI':
+            links.append({'uri':str(action.get('/URI','')),
+                          'rect':[float(v) for v in annotation.get('/Rect',[])]})
+    return links
+
+
 def extract_pdf_text(pdf,pdf_python=None):
     """Read actual PDF content via pypdf, using the bundled runtime if needed."""
     if pdf_python is None:
@@ -1047,13 +1082,18 @@ def extract_pdf_text(pdf,pdf_python=None):
         else:
             reader=PdfReader(pdf)
             texts=[page.extract_text() or '' for page in reader.pages]
-            return {'pages':len(texts),'last':texts[-1],'text':'\n'.join(texts)}
+            return {'pages':len(texts),'last':texts[-1],'text':'\n'.join(texts),
+                    'last_page_uri_links':pdf_uri_links(reader.pages[-1])}
     executable=Path(pdf_python) if pdf_python else Path.home()/'.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe'
     if not executable.is_file():
         raise RuntimeError('PDF validation requires pypdf or a --pdf-python runtime containing pypdf')
-    code=("import json,sys;from pypdf import PdfReader;"
-          "r=PdfReader(sys.argv[1]);t=[p.extract_text() or '' for p in r.pages];"
-          "print(json.dumps({'pages':len(t),'last':t[-1],'text':'\\n'.join(t)},ensure_ascii=False))")
+    code=("import json,sys\nfrom pypdf import PdfReader\n"
+          "r=PdfReader(sys.argv[1]);t=[p.extract_text() or '' for p in r.pages];links=[]\n"
+          "for ref in r.pages[-1].get('/Annots',[]):\n"
+          " a=ref.get_object();action=a.get('/A');action=action.get_object() if action is not None else {}\n"
+          " if a.get('/Subtype')=='/Link' and action.get('/S')=='/URI':\n"
+          "  links.append({'uri':str(action.get('/URI','')),'rect':[float(v) for v in a.get('/Rect',[])]})\n"
+          "print(json.dumps({'pages':len(t),'last':t[-1],'text':'\\n'.join(t),'last_page_uri_links':links},ensure_ascii=False))")
     output=subprocess.check_output([str(executable),'-c',code,str(pdf)],env={**os.environ,'PYTHONUTF8':'1'})
     return json.loads(output.decode('utf-8'))
 
@@ -1086,6 +1126,13 @@ def verify_pdf_pair(root,docx,audit,*,required=False,pdf=None,record_path=None,p
     audit.equal(pages,layout['page_count'],'PDF pages equal read-only Word layout diagnostics')
     actual=extract_pdf_text(pdf,pdf_python)
     audit.equal(actual['pages'],pages,'pypdf and Poppler agree on actual PDF page count')
+    repository_links=[link for link in actual['last_page_uri_links']
+                      if link['uri']==REPOSITORY_URL]
+    audit.check(bool(repository_links),'last PDF page has a real URI link to the repository')
+    for link in repository_links:
+        rect=link['rect']
+        audit.check(len(rect)==4 and rect[2]>rect[0] and rect[3]>rect[1],
+                    'repository PDF link has a nonempty clickable rectangle')
     last=actual['last'];all_text=actual['text']
     audit.equal(normal(last),normal(record['pdf_last_page_text']),'actual PDF last page matches recorded content')
     audit.equal(normal(record['word_last_page_text']),normal(layout['pages'][-1]['text']),
@@ -1114,7 +1161,9 @@ def verify_pdf_pair(root,docx,audit,*,required=False,pdf=None,record_path=None,p
     audit.equal(report_pdfs,[pdf.resolve()],'report submission directory contains only the current PDF')
     return {'pdf':str(pdf),'pdf_sha256':digest(pdf),'pages':pages,
             'source_docx_sha256':digest(docx),'export_record_sha256':digest(record_path),
-            'last_page_contains_table_A1':True,'independent_pdf_reader':'Poppler page count plus pypdf text'}
+            'last_page_contains_table_A1':True,'repository_hyperlink':REPOSITORY_URL,
+            'repository_link_annotation_count':len(repository_links),
+            'independent_pdf_reader':'Poppler page count plus pypdf text and link annotations'}
 
 
 def main():
@@ -1138,6 +1187,7 @@ def main():
     verify_dataset(data,audit)
     verify_raw_experiments(root,data,frozen,audit)
     blobs,document,tables,captions,paragraphs=document_parts(docx)
+    hyperlink_evidence=verify_repository_hyperlink(blobs,document,audit)
     by_id=verify_manifest(manifest,tables,captions,paragraphs,audit)
     cover_policy=verify_cover(document,manifest,audit,args.cover_source)
     verify_table_numbers(data,by_id,summary,cache,audit)
@@ -1156,6 +1206,7 @@ def main():
             'cover_policy':cover_policy,
             'sil_verification':sil_evidence,
             'synthetic_demo_verification':synthetic_evidence,
+            'repository_hyperlink_verification':hyperlink_evidence,
             'pdf_exported':pdf_evidence is not None,'details':audit.checks}
     if pdf_evidence is not None:result['pdf_verification']=pdf_evidence
     output.parent.mkdir(parents=True,exist_ok=True)

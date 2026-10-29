@@ -8,6 +8,7 @@ from pypdf import PdfReader
 
 ROOT=Path(__file__).resolve().parents[1]
 FINAL=ROOT/'results/report_final'
+REPOSITORY_URL='https://github.com/HZH507/openecg-beat-screening'
 
 
 def read(path):return json.loads(Path(path).read_text(encoding='utf-8-sig'))
@@ -28,6 +29,17 @@ def main():
     h=digest(docx)
     assert word['source_docx_sha256']==h and layout['source_sha256'].lower()==h
     reader=PdfReader(args.pdf);texts=[p.extract_text() or '' for p in reader.pages]
+    repository_links=[]
+    for ref in reader.pages[-1].get('/Annots',[]):
+        annotation=ref.get_object()
+        action=annotation.get('/A')
+        action=action.get_object() if action is not None else {}
+        if (annotation.get('/Subtype')=='/Link' and action.get('/S')=='/URI'
+                and str(action.get('/URI',''))==REPOSITORY_URL):
+            rect=[float(v) for v in annotation.get('/Rect',[])]
+            assert len(rect)==4 and rect[2]>rect[0] and rect[3]>rect[1], 'Empty repository link rectangle'
+            repository_links.append(rect)
+    assert repository_links, 'Final PDF page has no clickable repository URI annotation'
     assert len(texts)==word['word_page_count']==layout['page_count']
     assert all(len(norm(t))>10 for t in texts),'Blank PDF page'
     last=norm(texts[-1]);full=norm('\n'.join(texts))
@@ -58,6 +70,7 @@ def main():
             'renderer':'Microsoft Word','exported_at_utc':word['exported_at_utc'],
             'verified_at_utc':datetime.now(timezone.utc).isoformat(),
             'old_pdf_replaced':bool(args.install),'pdfinfo_page_count':int(match.group(1)),
+            'repository_hyperlink':REPOSITORY_URL,'repository_link_annotation_count':len(repository_links),
             'last_page_contains_complete_table_A1':True,'isolated_trailing_note':False}
     (FINAL/'pdf_export_verification.json').write_text(json.dumps(record,ensure_ascii=False,indent=2),encoding='utf-8')
     print(json.dumps({k:v for k,v in record.items() if not k.endswith('_text')},ensure_ascii=False,indent=2))

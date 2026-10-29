@@ -19,6 +19,7 @@ from docx.enum.table import WD_ALIGN_VERTICAL, WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+from docx.opc.constants import RELATIONSHIP_TYPE as RT
 from docx.shared import Cm, Pt, RGBColor
 
 
@@ -852,8 +853,20 @@ def build(root: Path, data_path: Path, out: Path, cover_from: Path | None = None
           [3.2, 3.3, 3.3, 3.3, 3.3], "表 A1  九条件的重建 RMSE 与分类 AUC", fs=7.8)
 
     heading("附录 B  代码与数据仓库")
-    para("代码、模型权重、冻结预测缓存与本报告所用图表见 GitHub 仓库："
-         "https://github.com/HZH507/openecg-beat-screening。", align=WD_ALIGN_PARAGRAPH.LEFT)
+    repo_url = "https://github.com/HZH507/openecg-beat-screening"
+    repo_paragraph = para("代码、模型权重、冻结预测缓存与本报告所用图表见 GitHub 仓库：",
+                          align=WD_ALIGN_PARAGRAPH.LEFT)
+    relationship = repo_paragraph.part.relate_to(repo_url, RT.HYPERLINK, is_external=True)
+    hyperlink = OxmlElement("w:hyperlink")
+    hyperlink.set(qn("r:id"), relationship)
+    hyperlink.set(qn("w:history"), "1")
+    link_run = repo_paragraph.add_run(repo_url)
+    font(link_run)
+    link_run.font.color.rgb = RGBColor(0x05, 0x63, 0xC1)
+    link_run.font.underline = True
+    hyperlink.append(link_run._r)
+    repo_paragraph._p.append(hyperlink)
+    font(repo_paragraph.add_run("。"))
     para("其中 openecg_ext/ 为 4.7 节参考 OpenECG 思路的自定义合成信号流程模块，sil/ 为 4.6 节的软件在环链路仿真；"
          "数据集 MIT-BIH 与 NSTDB 不随仓库分发，获取方式见仓库内 data/README.md。"
          "已有缓存可用于核验结果与重建报告，无需重新训练或推理；具体步骤与文件哈希见仓库说明。")

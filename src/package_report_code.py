@@ -113,6 +113,7 @@ def main():
             {"section": "1/3.6/4.7/图14", "change": "说明上游NeuroKit2已有预处理及R峰检测；将演示准确命名为参考上游思路的自定义合成信号流程验证"},
             {"section": "表7", "change": "注明展示部分记录及选择目的，完整22条结果仍保存在JSON"},
             {"section": "附录A/B", "change": "补充结果采用表A1；修正表5内容说明；附录B列出仓库；与生成器同步"},
+            {"section": "附录B仓库链接", "change": "改为真实外部超链接，导出PDF后核验末页URI与点击区域，显示为蓝色下划线"},
         ],
         "figure_changes": [
             {"figure": 6, "change": "标题明确DS2 ROC与OOF选定工作点；曲线和指标不变"},
