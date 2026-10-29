@@ -124,7 +124,7 @@ data/processed/dataset_stats.json
 
 ## 从冻结缓存核验并重建报告
 
-当前复现材料包含所需实验 JSON、缓存、模型和图表。在项目根目录运行下列命令即可生成封面留空的报告；全部步骤只读已有结果，不调用模型前向，也不需要下载原始数据库：
+当前复现材料包含所需实验 JSON、缓存、模型和图表。在项目根目录运行下列命令即可生成报告；全部步骤只读已有结果，不调用模型前向，也不需要下载原始数据库：
 
 ```powershell
 python src/verify_delivery.py
@@ -132,7 +132,7 @@ python src/build_medium_report.py
 python src/verify_report.py
 ```
 
-`build_medium_report.py` 从现有 `report_data.json` 读取原实验指标，并读取 SIL 与自定义合成演示的现成结果和图。`verify_report.py` 独立核对 11 张表、14 张嵌入图、关键文字与冻结来源，发现不一致即报错。个人封面通过本地 `--cover-source` 参数提供给生成器和验证器；个人 DOCX 和含封面全文的 Word 排版诊断不进入公开仓库或代码包。
+`build_medium_report.py` 从现有 `report_data.json` 读取原实验指标，并读取 SIL 与自定义合成演示的现成结果和图。`verify_report.py` 独立核对 11 张表、14 张嵌入图、关键文字与冻结来源，发现不一致即报错。
 
 如需重新整理汇总 JSON，可运行 `python src/assemble_final_report_data.py`，它只读取缓存。`python src/make_final_figures.py` 同样不推理模型，但部分原始波形图需要本地 MIT-BIH 记录及预处理数组；完整重画不是仅重建报告的前置步骤。已发布图表可直接用于报告构建。
 
