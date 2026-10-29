@@ -1,4 +1,4 @@
-# ECG 心搏筛查与去噪课程项目
+﻿# ECG 心搏筛查与去噪课程项目
 
 本项目实现离线 ECG 预处理、R 峰对齐心搏切分、轻量二分类筛查、四分类探索、一维 DnCNN 去噪及硬件链路的软件在环（SIL）仿真。课程报告包含个人信息，未随本仓库公开；本仓库只提供代码、模型权重、图表与指标 JSON，报告中的全部数字均可由本仓库脚本与结果文件复现。
 
@@ -62,7 +62,7 @@ README.md
 requirements.txt
 ```
 
-代码包保留以上相对路径。旧阶段的根目录指标和模型不作为本轮报告来源，历史备份和 `report/archive/` 不作为提交稿。原始 PhysioNet 数据和预处理大数组不放入代码包。
+仓库保留以上相对路径。旧阶段的根目录指标和模型不作为本轮报告来源，历史备份和 `report/archive/` 不作为提交稿。原始 PhysioNet 数据和预处理大数组不放入仓库。
 
 ## 模型与评价来源
 
@@ -92,7 +92,7 @@ requirements.txt
 python sil/run_sil.py
 ```
 
-该命令会重新执行四通路推理并覆盖工作副本的 `results/sil/`，应先备份。报告重建本身不需要运行它。代码包同时包含 `sil/` 与 `results/sil/`，`report_table_manifest.json` 和 `revision_changes.json` 记录 SIL JSON 及四个源码文件的 SHA-256；原主评价与原图表汇总 JSON 保持各自来源链。
+该命令会重新执行四通路推理并覆盖工作副本的 `results/sil/`，应先备份。报告重建本身不需要运行它。仓库同时包含 `sil/` 与 `results/sil/`，`report_table_manifest.json` 和 `revision_changes.json` 记录 SIL JSON 及四个源码文件的 SHA-256；原主评价与原图表汇总 JSON 保持各自来源链。
 
 ## 环境与数据
 
@@ -133,7 +133,7 @@ python src/verify_report.py
 
 原生 Word 页图与分页诊断可用 `render_docx_word.ps1`，只读源 DOCX，通过 Word 页 EMF 生成 PNG，不导 PDF。最终交付验收还应逐页检查文字、页眉页码、表格是否跨页、空白页及孤行。QA 页图仅用于检查，不作为报告附件。
 
-本轮最终 PDF 由 `export_report_pdf.ps1` 生成，`verify_exported_pdf.py` 核对 Word/PDF 页数、末页及当前指标；`verify_report.py --require-pdf` 进一步独立核对 DOCX/PDF 哈希与内容。同版本凭证为 `results/report_final/pdf_export_verification.json`。SNR 使用逐拍对数比值的算术均值，RMSE 使用全部心搏/采样点的全局均方根，二者不能互相反推。附录结尾说明位于表 A2 之前，避免单独形成尾页。
+本轮最终 PDF 由当前 DOCX 导出（`export_report_pdf.ps1` 为 Word 导出脚本），`verify_exported_pdf.py` 核对 Word/PDF 页数、末页及当前指标；`verify_report.py --require-pdf` 进一步独立核对 DOCX/PDF 哈希与内容。同版本凭证为 `results/report_final/pdf_export_verification.json`。SNR 使用逐拍对数比值的算术均值，RMSE 使用全部心搏/采样点的全局均方根，二者不能互相反推。附录 A 的引导句位于表 A1 之前，避免单独形成尾页。
 
 ## 在新工作副本中完整复现实验
 

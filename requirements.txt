@@ -1,3 +1,6 @@
+# torch 需从 CPU 索引安装，否则 pip install -r 可能解析失败：
+#   pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+# 其余依赖可直接 pip install -r requirements.txt
 numpy==2.5.4
 scipy==1.18.1
 wfdb==4.3.1
