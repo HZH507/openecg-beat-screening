@@ -1,4 +1,4 @@
-"""把 OpenECG 模拟信号接入本项目已有的预处理与二分类模型。"""
+"""处理自定义合成信号的数组输入，执行预处理与二分类。"""
 from __future__ import annotations
 
 import sys
@@ -24,7 +24,7 @@ DEFAULT_THRESHOLD = 0.5878590941429138
 
 
 def to_model_rate(signal: np.ndarray, fs_in: int = 1000) -> np.ndarray:
-    """把 OpenECG 的 1000 Hz 模拟信号重采样到模型要求的 360 Hz。"""
+    """把输入模拟信号重采样到模型要求的 360 Hz。"""
     return resample_poly(np.asarray(signal, dtype=np.float64), FS, fs_in)
 
 

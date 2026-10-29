@@ -1,15 +1,16 @@
 {
-  "docx_sha256": "01c4b39779fb01fd20b9f81d80f888cf7b68445d04153c6f7d792dadbf40c367",
-  "pages": 15,
-  "pdf_exported": true,
-  "pdf_sha256": "d792cb4f4a6d58c8c309f892bfdd7007f08a8acc9f21051e93054b2a89e3a7ed",
-  "pdf_pages": 15,
+  "revision_scope": "report wording, figure labels, reproducible distribution and verification only",
+  "report_docx_sha256": "32f221c7a9ca7c1426c6cd79f895d9ea725cc21e668fcfb154d47ed7c061586f",
+  "previous_docx_sha256": "476ec56b912d8cf757bfcf711e930b65b1bf906e59f4ad84edcb74c050971bd1",
+  "new_experiments": false,
+  "model_inference_performed": false,
   "frozen_binary": {
+    "model_sha256": "574d3c86ce8ad269e19ce7c0058e427ceaa36bcd52e2ce4f2173dbb2ffc14f1b",
     "selection_rule": "maximize pooled OOF sensitivity subject to pooled OOF specificity >= 0.90; ties higher specificity, then higher threshold",
     "threshold": 0.5878590941429138,
     "oof_auc": 0.7829259603704146,
     "ds2_auc": 0.8557944527396604,
-    "ds2_primary_metrics": {
+    "primary_metrics": {
       "threshold": 0.5878590941429138,
       "sensitivity": 0.7227322805728975,
       "specificity": 0.801554486093224,
@@ -26,718 +27,60 @@
     },
     "clean_ds2_inference_passes": 1
   },
-  "dataset": {
-    "groups": [
-      {
-        "key": "trainval",
-        "label": "训练与验证",
-        "records": [
-          "101",
-          "106",
-          "108",
-          "109",
-          "112",
-          "114",
-          "115",
-          "116",
-          "118",
-          "119",
-          "122",
-          "124",
-          "203",
-          "205",
-          "207",
-          "208",
-          "209",
-          "215",
-          "220",
-          "223",
-          "230"
-        ],
-        "n_records": 21,
-        "n": 49050,
-        "counts": {
-          "N": 44231,
-          "S": 816,
-          "V": 3590,
-          "F": 413
-        }
-      },
-      {
-        "key": "ds2",
-        "label": "测试 DS2",
-        "records": [
-          "100",
-          "103",
-          "105",
-          "111",
-          "113",
-          "117",
-          "121",
-          "123",
-          "200",
-          "202",
-          "210",
-          "212",
-          "213",
-          "214",
-          "219",
-          "221",
-          "222",
-          "228",
-          "231",
-          "232",
-          "233",
-          "234"
-        ],
-        "n_records": 22,
-        "n": 49705,
-        "counts": {
-          "N": 44259,
-          "S": 1837,
-          "V": 3221,
-          "F": 388
-        }
-      },
-      {
-        "key": "excluded201",
-        "label": "排除 201",
-        "records": [
-          "201"
-        ],
-        "n_records": 1,
-        "n": 1963,
-        "counts": {
-          "N": 1635,
-          "S": 128,
-          "V": 198,
-          "F": 2
-        }
-      },
-      {
-        "key": "protocol_excluded",
-        "label": "协议未纳入",
-        "records": [
-          "102",
-          "104",
-          "107",
-          "217"
-        ],
-        "n_records": 4,
-        "n": 733,
-        "counts": {
-          "N": 506,
-          "S": 0,
-          "V": 227,
-          "F": 0
-        }
-      },
-      {
-        "n_records": 48,
-        "n": 101451,
-        "counts": {
-          "N": 90631,
-          "S": 2781,
-          "V": 7236,
-          "F": 803
-        },
-        "key": "total",
-        "label": "合计"
-      }
-    ]
-  },
-  "auxiliary_split": {
-    "train_records": [
-      "101",
-      "106",
-      "109",
-      "112",
-      "114",
-      "115",
-      "116",
-      "118",
-      "119",
-      "122",
-      "203",
-      "207",
-      "208",
-      "209",
-      "215",
-      "220",
-      "230"
-    ],
-    "val_records": [
-      "108",
-      "124",
-      "205",
-      "223"
-    ],
-    "train_n": 40407,
-    "val_n": 8643
-  },
-  "new_classification": {
-    "cnn": {
-      "accuracy": 0.83882909164068,
-      "macro_f1": 0.383787822894721
-    },
-    "mlp": {
-      "accuracy": 0.8337994165576904,
-      "macro_f1": 0.37401315853184297
-    }
-  },
-  "denoiser_best_epoch": 4,
-  "noise": {
-    "threshold": 0.5878590941429138,
-    "conditions": [
-      {
-        "condition": "bw_5dB",
-        "raw": 0.4810048941594217,
-        "classical": 0.6939733675170568,
-        "denoised": 0.6509734301406249
-      },
-      {
-        "condition": "bw_10dB",
-        "raw": 0.5975625484731044,
-        "classical": 0.7267275863724392,
-        "denoised": 0.6955758469550644
-      },
-      {
-        "condition": "bw_15dB",
-        "raw": 0.686019028889981,
-        "classical": 0.7339656446130416,
-        "denoised": 0.7162701476420948
-      },
-      {
-        "condition": "em_5dB",
-        "raw": 0.6719560606303461,
-        "classical": 0.6977086533538146,
-        "denoised": 0.6904658308303174
-      },
-      {
-        "condition": "em_10dB",
-        "raw": 0.7261272127381857,
-        "classical": 0.7247164355908835,
-        "denoised": 0.7212911821352002
-      },
-      {
-        "condition": "em_15dB",
-        "raw": 0.7435141208478856,
-        "classical": 0.7280904272875697,
-        "denoised": 0.730729357190952
-      },
-      {
-        "condition": "ma_5dB",
-        "raw": 0.45657125761362405,
-        "classical": 0.5266880917824315,
-        "denoised": 0.585516521190047
-      },
-      {
-        "condition": "ma_10dB",
-        "raw": 0.5767084911357444,
-        "classical": 0.6500221024685775,
-        "denoised": 0.6732922167651285
-      },
-      {
-        "condition": "ma_15dB",
-        "raw": 0.6729723192172423,
-        "classical": 0.7014534097526193,
-        "denoised": 0.7032093804649893
-      }
-    ],
-    "old_threshold_056_results_used": false,
-    "per_channel_chronological_split": "65% training/validation, 35% test"
-  },
-  "demo": {
-    "record": "208",
-    "task": "four-class functional demo",
-    "n_beats": 13,
-    "mismatches": 0,
-    "pred_counts": {
-      "N": 5,
-      "S": 0,
-      "V": 6,
-      "F": 2
-    },
-    "not_independent_validation": true
-  },
-  "cost": {
-    "models": [
-      {
-        "key": "binary",
-        "name": "轻量 CNN 二分类",
-        "params": 9058,
-        "fp32_kib": 35.3828125,
-        "int8_kib": 8.845703125,
-        "latency_ms": 0.11517187476783874,
-        "latency_ms_samples": [
-          0.3269750004619709,
-          0.22568281292478787,
-          0.21241484409983968,
-          0.12409218743414385,
-          0.08704218726052204,
-          0.09804843739402713,
-          0.09716406293591717,
-          0.07768593695800519,
-          0.09687578130979091,
-          0.10999843743775273,
-          0.14465390631812625,
-          0.21184921843087068,
-          0.1934546871780185,
-          0.1675507810432464,
-          0.09433203103981214,
-          0.09643046905694064,
-          0.12034531209792476,
-          0.13073828176857205,
-          0.09022499943966977,
-          0.08025859369809041
-        ],
-        "checkpoint": "results/workpoint_cv_v2/final_binary.pt",
-        "checkpoint_sha256": "574d3c86ce8ad269e19ce7c0058e427ceaa36bcd52e2ce4f2173dbb2ffc14f1b"
-      },
-      {
-        "key": "cnn",
-        "name": "轻量 CNN 四分类",
-        "params": 9188,
-        "fp32_kib": 35.890625,
-        "int8_kib": 8.97265625,
-        "latency_ms": 0.11533046836120775,
-        "latency_ms_samples": [
-          0.16362187488994095,
-          0.09399062491866061,
-          0.179879687493667,
-          0.08019921824597986,
-          0.15870546849328093,
-          0.23925781260913936,
-          0.17627265606279252,
-          0.11144843756483169,
-          0.08409531255892944,
-          0.1036921876220731,
-          0.10529218707233667,
-          0.11319921850372339,
-          0.14631718750024447,
-          0.11224765603401465,
-          0.09279140613216441,
-          0.11746171821869211,
-          0.15370781238743803,
-          0.11129999984405003,
-          0.12701718787866412,
-          0.1318296872341307
-        ],
-        "checkpoint": "results/report_final/models/cnn_light_best.pt",
-        "checkpoint_sha256": "4f1c27fe26c7b792b951e51a72d48ebdfb78b433ce0f4217a585da3af5a659eb"
-      },
-      {
-        "key": "mlp",
-        "name": "MLP 四分类",
-        "params": 41412,
-        "fp32_kib": 161.765625,
-        "int8_kib": 40.44140625,
-        "latency_ms": 0.0027976561796094757,
-        "latency_ms_samples": [
-          0.002879687599488534,
-          0.0027531250452739187,
-          0.002732031134655699,
-          0.002715625669225119,
-          0.0033164060369017534,
-          0.004052343683724757,
-          0.003880469193973113,
-          0.0027968753784080036,
-          0.0027875003070221283,
-          0.0027867181415786035,
-          0.002791406586766243,
-          0.002748437509580981,
-          0.0027984369808109477,
-          0.0032296875360771082,
-          0.012000781680399086,
-          0.0032570314942859113,
-          0.002775000211840961,
-          0.003498437763482798,
-          0.0029718758014496416,
-          0.0025070312403840944
-        ],
-        "checkpoint": "results/report_final/models/mlp_best.pt",
-        "checkpoint_sha256": "6e3de640a83a6817b231daedbe29fcadb378353c22988f8552b0a53946291715"
-      },
-      {
-        "key": "denoiser",
-        "name": "DnCNN",
-        "params": 46049,
-        "fp32_kib": 179.87890625,
-        "int8_kib": 44.9697265625,
-        "latency_ms": 1.23427734388315,
-        "latency_ms_samples": [
-          1.3240367188700475,
-          1.140519530963502,
-          1.104389061765687,
-          1.6019960930861998,
-          1.8080335939885117,
-          1.6939515626290813,
-          1.2874882813775912,
-          1.5987976557880756,
-          1.1028273438569158,
-          1.190689843497239,
-          1.2583875004565925,
-          1.3324531246325932,
-          1.165410156318103,
-          1.2447148437786382,
-          1.0504867186682532,
-          1.0351273431297159,
-          1.255192187272769,
-          1.1581929693420534,
-          1.2238398439876619,
-          1.0848250003618887
-        ],
-        "checkpoint": "results/report_final/models/denoiser_best.pt",
-        "checkpoint_sha256": "76c30cb14a5f3390adac7ea06296c1558e251ca5ef58b837fbdb3395d11ab9df"
-      }
-    ],
-    "threads": 4,
-    "batch": 128,
-    "repetitions": 20,
-    "warmups": 5,
-    "statistic": "median batch latency divided by 128",
-    "input": "seeded synthetic FP32 tensor",
-    "scope": "network forward only; excludes filtering/R-peak detection/normalization/I-O",
-    "int8_note": "weight byte-count estimate only; no INT8 execution or MCU measurement"
-  },
-  "sil": {
-    "source": {
-      "path": "results/sil/sil_metrics.json",
-      "sha256": "d36aeb132fa208c955de7f7b6fd00dc4e95fb2b31f0e6639272868c3869227c8"
-    },
-    "source_files": [
-      {
-        "path": "sil/afe.py",
-        "sha256": "87f1940cf30267e51c6c0fbda8b469b3c8188578860455b5fc429fc1132a9a32"
-      },
-      {
-        "path": "sil/adc.py",
-        "sha256": "aa4c9d2610c94e68304d7afb2d75f779df78cb26c2e55237daffbb5578c51ae8"
-      },
-      {
-        "path": "sil/link.py",
-        "sha256": "8fad914ae0d3f546b7a314281b065c4de27054d4b49987ec5b4bd5bf46776674"
-      },
-      {
-        "path": "sil/run_sil.py",
-        "sha256": "608f5bb0c95f472533250cc91baaa7c0a87b83f97fa35a0a33b736993c0bd8b8"
-      }
-    ],
-    "predictions": {
-      "path": "results/sil/sil_predictions.npz",
-      "sha256": "8cff6985f1a3533e1e3590e93b542e3134d6a9bb34bd2d8b9ddc16d7a9ccaa47"
-    },
-    "n_beats": 49705,
-    "n_abnormal": 5446,
-    "threshold": 0.5878590941429138,
-    "pathway_metrics": {
-      "ideal": {
-        "auc": 0.8557944527396604,
-        "accuracy": 0.7929182174831506,
-        "macro_f1": 0.6533349927549374,
-        "sensitivity": 0.7227322805728975,
-        "specificity": 0.801554486093224,
-        "tp": 3936,
-        "fp": 8783,
-        "tn": 35476,
-        "fn": 1510
-      },
-      "quant_link": {
-        "auc": 0.85304984372487,
-        "accuracy": 0.7866210642792476,
-        "macro_f1": 0.6482491634118597,
-        "sensitivity": 0.7275064267352185,
-        "specificity": 0.7938950270001581,
-        "tp": 3962,
-        "fp": 9122,
-        "tn": 35137,
-        "fn": 1484
-      },
-      "sil": {
-        "auc": 0.8456162070631927,
-        "accuracy": 0.8308620863092244,
-        "macro_f1": 0.6730962928396463,
-        "sensitivity": 0.6213734851266985,
-        "specificity": 0.8566393275943875,
-        "tp": 3384,
-        "fp": 6345,
-        "tn": 37914,
-        "fn": 2062
-      },
-      "sil_aligned": {
-        "auc": 0.8435316197082049,
-        "accuracy": 0.8132783422190927,
-        "macro_f1": 0.6577638322585304,
-        "sensitivity": 0.635145060594932,
-        "specificity": 0.8351973609887254,
-        "tp": 3459,
-        "fp": 7294,
-        "tn": 36965,
-        "fn": 1987
-      }
-    },
-    "delta_auc_quant_link": -0.0027446090147903446,
-    "delta_auc": -0.010178245676467634,
-    "delta_auc_aligned": -0.012262833031455478,
-    "mean_lag_samples": 3.3181818181818183,
-    "lag_ms": 9.22,
-    "alignment_method": "per-record waveform cross-correlation; positive lag shifted left, negative lag shifted right; edge padding",
-    "alignment_scope": "offline reference-assisted SIL analysis; no threshold or model adjustment",
-    "alignment_correction": {
-      "change": "corrected positive-lag shift from right to left; negative-lag shift from left to right; reran SIL only with user authorization",
-      "previous_source": {
-        "path": "backup_sil_report_20261029/results/sil/sil_metrics.json",
-        "sha256": "60e9410b23448b7d159c0c2ad8db46bfd4bdf04e8e270cd6834fcc80615cd123"
-      },
-      "previous_aligned_metrics": {
-        "auc": 0.8567312376683116,
-        "accuracy": 0.8321094457298058,
-        "macro_f1": 0.6779037762568649,
-        "sensitivity": 0.6397355857510099,
-        "specificity": 0.8557807451591767,
-        "tp": 3484,
-        "fp": 6383,
-        "tn": 37876,
-        "fn": 1962
-      },
-      "previous_delta_auc_aligned": 0.0009367849286512353,
-      "ideal_and_unaligned_device_metrics_reproduced": true,
-      "current_aligned_metrics": {
-        "auc": 0.8435316197082049,
-        "accuracy": 0.8132783422190927,
-        "macro_f1": 0.6577638322585304,
-        "sensitivity": 0.635145060594932,
-        "specificity": 0.8351973609887254,
-        "tp": 3459,
-        "fp": 7294,
-        "tn": 36965,
-        "fn": 1987
-      },
-      "current_delta_auc_aligned": -0.012262833031455478,
-      "withdrawn_conclusions": [
-        "aligned AUC almost unchanged",
-        "probabilities shifted down overall"
-      ]
-    },
-    "probability_summary": {
-      "ideal": {
-        "mean": 0.3813997988410521,
-        "median": 0.2654179036617279,
-        "predicted_positive_rate": 0.25588974952218085
-      },
-      "quant_link": {
-        "mean": 0.3861190411861025,
-        "median": 0.2705651819705963,
-        "predicted_positive_rate": 0.26323307514334576
-      },
-      "sil": {
-        "mean": 0.36771438894007374,
-        "median": 0.2979159653186798,
-        "predicted_positive_rate": 0.19573483552962478
-      },
-      "sil_aligned": {
-        "mean": 0.3880469859232182,
-        "median": 0.31179603934288025,
-        "predicted_positive_rate": 0.21633638466955035
-      }
-    },
-    "mean_probability_delta_aligned_vs_ideal": 0.006647187082166106,
-    "ideal_matches_frozen_cache_max_dev": 1.1920928955078125e-07,
-    "afe": {
-      "hp_hz": 0.5,
-      "lp_hz": 40.0,
-      "order": 4,
-      "fs": 360,
-      "note": "源数据已是 360 Hz 数字记录，未模拟采样前混叠"
-    },
-    "adc": {
-      "bits": 11,
-      "vmin": -5.0,
-      "vmax": 5.0,
-      "lsb_mV": 0.004885197850512946
-    },
-    "link": {
-      "n_packets": 715000,
-      "lost_packets": 7158,
-      "loss_rate": 0.01
-    },
-    "scope": "software in the loop; not physical hardware integration",
-    "source_is_digitized_360_hz": true,
-    "pre_sampling_aliasing_simulated": false,
-    "link_parameters_are_configured_not_measured": true,
-    "frozen_model_and_threshold_unchanged": true,
-    "inference_scope": "original clean DS2 main evaluation cache/audit unchanged; SIL separately runs four pathways including ideal reconstruction and quantization/link ablation; authorized correction reran SIL; component ablation outputs subsequently supplied by user"
-  },
+  "numeric_changes": [],
   "paragraph_changes": [
     {
-      "section": "摘要/4.1/5/6",
-      "change": "OOF与DS2 AUC同报；主点规则、全正常基线与校准迁移发现一致；去掉旧主指标"
+      "section": "摘要/关键词/4.1/5/6",
+      "change": "将目标特异性未保持解释为工作点与分数分布迁移，概率校准问题留待专门评价"
     },
     {
-      "section": "2.1与表1",
-      "change": "四段式样本总账，全部模型训练/验证排除201，733心搏单列"
+      "section": "摘要/4.6/README",
+      "change": "将整套AFE消融与单独低通因果归因区分，保留幅频、相频与形态改变为可能解释"
     },
     {
-      "section": "2.2/3.2/3.3",
-      "change": "逐拍归一化、五折与内层选轮次、冻结后一次干净推理；辅助17/4及实际抽样量披露"
+      "section": "1/3.6/4.7/图14",
+      "change": "说明上游NeuroKit2已有预处理及R峰检测；将演示准确命名为参考上游思路的自定义合成信号流程验证"
     },
     {
-      "section": "3.4/4.2/5",
-      "change": "新模型新阈值27组噪声评价，逐通道时间切分修正；分别解释重建与分类，按实测收益/退化写结论"
+      "section": "表7",
+      "change": "注明展示部分记录及选择目的，完整22条结果仍保存在JSON"
     },
     {
-      "section": "4.3/4.5",
-      "change": "采用新四分类权重与demo；真值和预测分开；208仅DS1功能演示"
-    },
-    {
-      "section": "3.1/3.6/4.5/5",
-      "change": "离线软件、硬件接口设计和资源估算分开；INT8仅估算；新桌面CPU摊销时延"
-    },
-    {
-      "section": "参考文献/附录/封面属性",
-      "change": "补六条文献与新复现命令；清属性和封面蓝线；个人信息只留一处占位"
-    },
-    {
-      "section": "3.5",
-      "change": "SNR采用逐拍定义及各拍dB均值；RMSE为全局均方根，聚合口径不同不能互相反推"
-    },
-    {
-      "section": "图2/图6/附录尾部",
-      "change": "图注补分隔符；尾部说明并入表A2之前，缩小尾部空段，避免两行孤页"
-    },
-    {
-      "section": "PDF交付",
-      "change": "Word从当前DOCX重新导出同名PDF覆盖旧版，核对页数和完整末页"
-    },
-    {
-      "section": "SIL源码/结果",
-      "change": "经授权修正正lag左移、负lag右移并仅重跑SIL；主评价缓存及模型阈值保持；记录备份旧对齐结果与当前结果的对照，撤回原排序几乎无影响和概率整体下移结论"
-    },
-    {
-      "section": "4.6/表9/图12/图13",
-      "change": "SIL链路方法、同一冻结模型与阈值下的四通路结果、相位和工作点迁移分析；表9在理想通路后增加仅量化+链路，图13采用四条ROC；明确数字源、未模拟采样前混叠及非实物联调边界"
-    },
-    {
-      "section": "摘要/6",
-      "change": "补充SIL结论，并保留原OOF/DS2主评价与阈值冻结口径"
-    },
-    {
-      "section": "表10/表A1/代码包",
-      "change": "资源表由表9顺延为表10；表A1增加sil四个源文件及results/sil输出，代码包纳入完整sil模块与SIL结果；绑定JSON与源码哈希"
-    },
-    {
-      "section": "摘要/4.6",
-      "change": "采用用户重跑的组件消融结果，替换尚未消融的旧段落；仅量化与链路接近理想，主要损失归于AFE串联低通；保留整数时延对齐后的频率相关相位与形态差异说明"
+      "section": "附录A/B",
+      "change": "补充结果采用表A1；修正表5内容说明；附录B列出仓库；与生成器同步"
     }
-  ],
-  "table_changes": [
-    "表1",
-    "表4",
-    "表5",
-    "表6",
-    "表7",
-    "表8",
-    "表9（SIL四通路，增加仅量化+链路）",
-    "表10（原表9资源）",
-    "表A1（增加SIL）",
-    "表A2"
   ],
   "figure_changes": [
     {
-      "id": "figure1",
-      "filename": "fig02_beat_examples.png",
-      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig02_beat_examples.png",
-      "caption": "图 1  四类心搏的典型波形与标注类别",
-      "sha256": "93d69b9838c95754e15bdf02430c8f4ac3e14d0e01c792c6d6c7517aa9a55193"
+      "figure": 6,
+      "change": "标题明确DS2 ROC与OOF选定工作点；曲线和指标不变"
     },
     {
-      "id": "figure2",
-      "filename": "fig01_dataset_distribution.png",
-      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig01_dataset_distribution.png",
-      "caption": "图 2  训练/验证、测试、201 排除与协议未纳入的四段样本分布",
-      "sha256": "c5de48ec203372ceb103f1e838a2ab930cb18e77090b7eb1b9a479a382a09e76"
-    },
-    {
-      "id": "figure3",
-      "filename": "fig03_filtering.png",
-      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig03_filtering.png",
-      "caption": "图 3  离线带通滤波前后的 ECG 与 R 峰位置",
-      "sha256": "09898fcca383a543179303f78df440f1c847f160ccf0f5c3211933c12348c191"
-    },
-    {
-      "id": "figure4",
-      "filename": "fig10_system_integration.png",
-      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig10_system_integration.png",
-      "caption": "图 4  已运行离线软件与 OpenECG 候选接入设计",
-      "sha256": "49354c45375006dd1232c1f545aeb67d1f6b67e0a1569d8c70550ccc17823258"
-    },
-    {
-      "id": "figure5",
-      "filename": "fig05_training_curves.png",
-      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig05_training_curves.png",
-      "caption": "图 5  排除 201 后四分类 CNN 与 DnCNN 的训练和验证曲线",
-      "sha256": "9af3f8078b429bac7f1343f90fb7681a98a2d964a3f6a8ecbec99943985d1d28"
-    },
-    {
-      "id": "figure6",
-      "filename": "fig06b_binary_roc.png",
-      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig06b_binary_roc.png",
-      "caption": "图 6  混淆矩阵、ROC 与 OOF 冻结工作点",
-      "sha256": "5bb2c7f4ae4fe83a121353ab6da78466448f624f4ba169b56e6a3cac0a724cfe"
-    },
-    {
-      "id": "figure7",
-      "filename": "fig04_denoising_example.png",
-      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig04_denoising_example.png",
-      "caption": "图 7  本轮 DnCNN 在固定含噪输入上的波形重建示例",
-      "sha256": "ffc622f59dd46e8b9b4b7d83e5622780ba367ddab549de3c262ddeb0c53157d4"
-    },
-    {
-      "id": "figure8",
-      "filename": "fig05b_denoising_snr.png",
-      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig05b_denoising_snr.png",
-      "caption": "图 8  本轮九条件输入 输出 SNR 与 ΔSNR",
-      "sha256": "75ba7c3d9e6d22c39a2b5ac36edda378277fcf61209af7264ded90910f7ef739"
-    },
-    {
-      "id": "figure9",
-      "filename": "fig08_noise_robustness.png",
-      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig08_noise_robustness.png",
-      "caption": "图 9  当前二分类模型冻结阈值下三种处理的 Macro-F1",
-      "sha256": "03e22834386769b4dfffc91fe4a000b4cbeac7dc1d07d5a825799599dfc31bac"
-    },
-    {
-      "id": "figure10",
-      "filename": "fig06_confusion_matrices.png",
-      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig06_confusion_matrices.png",
-      "caption": "图 10  本轮四分类 CNN 与 MLP 在 DS2 上的混淆矩阵",
-      "sha256": "856eb143d3cd61d89d0af922586f2a1119f8fa1809225c4e9f50cbe939cace0a"
-    },
-    {
-      "id": "figure11",
-      "filename": "fig11_openecg_demo.png",
-      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig11_openecg_demo.png",
-      "caption": "图 11  本轮四分类权重的端到端演示与真值预测对照",
-      "sha256": "289829ceaf07ade990625b95463ac69603762485018b9cc3737bb1aa13cfa8b1"
-    },
-    {
-      "id": "figure12",
-      "filename": "sil_afe.png",
-      "path": "D:\\openecg（1）\\results\\sil\\sil_afe.png",
-      "caption": "图 12  软件在环 AFE 幅频响应与设备链路波形",
-      "sha256": "0f8a5151c24b10526d52181523c2d2e82b9620a592dc2a413d9eab1fc0f9e2c7"
-    },
-    {
-      "id": "figure13",
-      "filename": "sil_roc.png",
-      "path": "D:\\openecg（1）\\results\\sil\\sil_roc.png",
-      "caption": "图 13  软件在环四通路 ROC 对照",
-      "sha256": "205b7f98a546b13b188a37ef4072919789b09a925b6d406d41d5089ba814d732"
+      "figure": 14,
+      "change": "明确自定义合成输入；纵轴匹配实际未标准化波形；读取既有概率，不推理模型"
     }
   ],
+  "repository_changes": [
+    "发布原冻结NPZ与CSV缓存和本轮图表",
+    "保留原冻结源码及JSON的准确换行字节",
+    "补充标准库文件完整性检查",
+    "更新11表14图验收规则",
+    "排除含个人封面全文的本地QA材料"
+  ],
   "verification": {
-    "checks": 2158,
-    "tables": 13,
-    "embedded_figures": 13
+    "checks": 2135,
+    "tables": 11,
+    "figures": 14
+  },
+  "word_layout": {
+    "page_count": 17,
+    "blank_page_count": 0,
+    "split_table_count": 0,
+    "orphan_heading_count": 0,
+    "private_layout_evidence_sha256": "98d765f7804c08bdf4aee58c6b2492c6d0b9255f3616fbf6a1f9580cf5bd2578"
+  },
+  "pdf": {
+    "sha256": "30e933044f4bc81d6fa57df951e1cc30b21885b7aed2d7de31eedc933a41682e",
+    "pages": 17
   }
 }

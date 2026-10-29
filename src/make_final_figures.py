@@ -205,7 +205,7 @@ def draw(root):
         r = binary["working_points"][key]
         axes[1].scatter(1-r["specificity"], r["sensitivity"], s=64 if marker=="*" else 25,
                         marker=marker, color=color, label=f"{label}  t={r['threshold']:.4f}", zorder=3)
-    axes[1].set(xlim=(0,1), ylim=(0,1.02), xlabel="1 − Sp", ylabel="Se", title=f"ROC  OOF AUC={oof['oof_auc']:.4f}")
+    axes[1].set(xlim=(0,1), ylim=(0,1.02), xlabel="1 − Sp", ylabel="Se", title="DS2 ROC 与 OOF 选定工作点")
     axes[1].legend(frameon=False, loc="lower right", fontsize=8)
     fig.tight_layout(w_pad=1.8)
     save(fig, "fig06b_binary_roc.png", ["workpoint_cv_v2/ds2_predictions.npz", "workpoint_cv_v2/ds2_summary.json", "workpoint_cv_v2/oof_selection.json"],

@@ -92,7 +92,7 @@
     {
       "filename": "fig06b_binary_roc.png",
       "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig06b_binary_roc.png",
-      "sha256": "5bb2c7f4ae4fe83a121353ab6da78466448f624f4ba169b56e6a3cac0a724cfe",
+      "sha256": "55f8f55449eddf4f4ef2896ca5c1059852375296a61927300fd941a27049d22a",
       "sources": [
         "workpoint_cv_v2/ds2_predictions.npz",
         "workpoint_cv_v2/ds2_summary.json",

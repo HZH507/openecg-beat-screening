@@ -1,5 +1,5 @@
 {
-  "source": "OpenECG simulated ECG (jwlee95/OpenECG notebook model)",
+  "source": "Custom Gaussian ECG inspired by OpenECG; modified waveform parameters, arbitrary amplitude",
   "fs_sim_hz": 1000,
   "fs_model_hz": 360,
   "duration_s": 10.0,

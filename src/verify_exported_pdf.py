@@ -17,20 +17,22 @@ def norm(text):return re.sub(r'\s+','',text)
 
 def main():
     ap=argparse.ArgumentParser()
+    ap.add_argument('--docx',type=Path,default=ROOT/'report/ECG_课程报告_标准版.docx')
     ap.add_argument('--pdf',type=Path,default=ROOT/'report/ECG_课程报告_标准版.pdf')
     ap.add_argument('--word-summary',type=Path,default=FINAL/'word_export_summary.json')
+    ap.add_argument('--layout',type=Path,default=FINAL/'word_layout_diagnostics.json')
     ap.add_argument('--install',action='store_true')
     args=ap.parse_args()
-    docx=ROOT/'report/ECG_课程报告_标准版.docx'
-    word=read(args.word_summary);layout=read(FINAL/'word_layout_diagnostics.json')
+    docx=args.docx
+    word=read(args.word_summary);layout=read(args.layout)
     h=digest(docx)
     assert word['source_docx_sha256']==h and layout['source_sha256'].lower()==h
     reader=PdfReader(args.pdf);texts=[p.extract_text() or '' for p in reader.pages]
     assert len(texts)==word['word_page_count']==layout['page_count']
     assert all(len(norm(t))>10 for t in texts),'Blank PDF page'
     last=norm(texts[-1]);full=norm('\n'.join(texts))
-    assert '表A2' in last and '肌电/15' in last and len(last)>400,'Incomplete or isolated last page'
-    assert '完整精度阈值' in last and last.index('完整精度阈值')<last.index('表A2')
+    assert '表A1' in last and '肌电/15' in last and len(last)>400,'Incomplete or isolated last page'
+    assert '附录B' in last and '代码与数据仓库' in last,'Repository appendix missing from final page'
     for token in ('0.8558','0.7829','0.5879','72.27%','80.16%','79.29%','0.6533',
                   '算术均值','全局均方根','不能互相反推',
                   '训练/验证、测试、201排除与协议未纳入的四段样本分布',
@@ -56,7 +58,7 @@ def main():
             'renderer':'Microsoft Word','exported_at_utc':word['exported_at_utc'],
             'verified_at_utc':datetime.now(timezone.utc).isoformat(),
             'old_pdf_replaced':bool(args.install),'pdfinfo_page_count':int(match.group(1)),
-            'last_page_contains_complete_table_A2':True,'isolated_trailing_note':False}
+            'last_page_contains_complete_table_A1':True,'isolated_trailing_note':False}
     (FINAL/'pdf_export_verification.json').write_text(json.dumps(record,ensure_ascii=False,indent=2),encoding='utf-8')
     print(json.dumps({k:v for k,v in record.items() if not k.endswith('_text')},ensure_ascii=False,indent=2))
 

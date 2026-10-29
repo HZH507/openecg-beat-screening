@@ -107,7 +107,32 @@ def sum_over_time(expression):
     return node
 
 
-def build(root: Path, data_path: Path, out: Path):
+def document_with_cover(cover_from: Path | None):
+    """Keep a local submission cover without putting identity in public sources.
+
+    The existing document package also preserves the cover's styles, section
+    boundary, headers and footers. Only content from the abstract onwards is
+    replaced. The public/default build uses blank identity fields instead.
+    """
+    if cover_from is None:
+        return Document()
+    doc = Document(cover_from)
+    body = doc.element.body
+    children = list(body)
+    start = next((i for i, element in enumerate(children)
+                  if "".join(element.xpath(".//w:t/text()")).replace(" ", "").strip() == "摘要"), None)
+    must(start is not None, "Cover source has no abstract heading")
+    must(any(element.xpath(".//w:sectPr") for element in children[:start]),
+         "Cover source must have a section break before the abstract")
+    must(not any(element.tag == qn("w:tbl") for element in children[:start]),
+         "The submission cover must use paragraphs, not an untracked table")
+    for element in children[start:]:
+        if element.tag != qn("w:sectPr"):
+            body.remove(element)
+    return doc
+
+
+def build(root: Path, data_path: Path, out: Path, cover_from: Path | None = None):
     data = read_json(data_path)
     final = root / "results" / "report_final"
     binary = data["binary"]
@@ -122,13 +147,6 @@ def build(root: Path, data_path: Path, out: Path):
     environment = data["environment"]
     groups = data["dataset"]["groups"]
     architecture = data["architecture"]
-    reproduction = dict(data["reproduction"])
-    reproduction["files"] = list(reproduction["files"]) + [
-        ["sil/afe.py、adc.py、link.py、run_sil.py", "因果前端、ADC、传输重组与四通路软件在环评价"],
-        ["results/sil/", "SIL 指标 JSON、逐拍预测缓存、AFE 波形图与四通路 ROC 图"],
-        ["openecg_ext/analysis/", "OpenECG 模拟信号接入：simulate、pipeline、run_demo"],
-        ["results/openecg_demo/", "OpenECG 模拟信号的三段处理图与逐拍判读 JSON"],
-    ]
     sil_path = root / "results" / "sil" / "sil_metrics.json"
     sil = read_json(sil_path)
     openecg_path = root / "results" / "openecg_demo" / "openecg_demo.json"
@@ -181,9 +199,12 @@ def build(root: Path, data_path: Path, out: Path):
         "sil_source": {"path": "results/sil/sil_metrics.json", "sha256": sha256(sil_path)},
         "sil_source_files": [{"path": f"sil/{name}", "sha256": sha256(root / "sil" / name)}
                              for name in ("afe.py", "adc.py", "link.py", "run_sil.py")],
+        "openecg_source": {"path": "results/openecg_demo/openecg_demo.json", "sha256": sha256(openecg_path)},
+        "cover_provenance": ({"mode": "preserved", "source_sha256": sha256(cover_from)}
+                             if cover_from else {"mode": "blank"}),
         "tables": [], "key_text": [], "figures": [],
     }
-    doc = Document()
+    doc = document_with_cover(cover_from)
     cp = doc.core_properties
     cp.title = "基于深度学习的 ECG 心搏异常筛查与去噪"
     cp.subject = "生物医学传感检测与仪器课程项目报告"
@@ -205,24 +226,24 @@ def build(root: Path, data_path: Path, out: Path):
         section.header_distance, section.footer_distance = Cm(1.0), Cm(.9)
         section.different_first_page_header_footer = cover
 
-    configure_section(doc.sections[0], cover=True)
-    normal = doc.styles["Normal"]
-    normal.font.name = EN
-    normal._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"), CN)
-    normal.font.size = Pt(BODY)
-    normal.paragraph_format.line_spacing = LINE
-    normal.paragraph_format.space_after = Pt(0)
-    normal.paragraph_format.widow_control = True
-    for style_name, size in (("Title", 20), ("Subtitle", 10), ("Heading 1", 13), ("Heading 2", 11.5)):
-        style = doc.styles[style_name]
-        style.font.name = HEAD if style_name != "Subtitle" else EN
-        style._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"), HEAD if style_name != "Subtitle" else CN)
-        style.font.size = Pt(size)
-        style.font.color.rgb = RGBColor(0, 0, 0)
-        style.font.bold = style_name != "Subtitle"
-        # Remove the template's title border while preserving cover typography.
-        for border in list(style.element.xpath("./w:pPr/w:pBdr")):
-            border.getparent().remove(border)
+    if cover_from is None:
+        configure_section(doc.sections[0], cover=True)
+        normal = doc.styles["Normal"]
+        normal.font.name = EN
+        normal._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"), CN)
+        normal.font.size = Pt(BODY)
+        normal.paragraph_format.line_spacing = LINE
+        normal.paragraph_format.space_after = Pt(0)
+        normal.paragraph_format.widow_control = True
+        for style_name, size in (("Title", 20), ("Subtitle", 10), ("Heading 1", 13), ("Heading 2", 11.5)):
+            style = doc.styles[style_name]
+            style.font.name = HEAD if style_name != "Subtitle" else EN
+            style._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"), HEAD if style_name != "Subtitle" else CN)
+            style.font.size = Pt(size)
+            style.font.color.rgb = RGBColor(0, 0, 0)
+            style.font.bold = style_name != "Subtitle"
+            for border in list(style.element.xpath("./w:pPr/w:pBdr")):
+                border.getparent().remove(border)
 
     def font(run, size=BODY, bold=False, cn=CN, italic=False):
         run.font.name = EN
@@ -350,79 +371,73 @@ def build(root: Path, data_path: Path, out: Path):
         font(run, 8.5)
         font(p.add_run(" 页"), 8.5)
 
-    # Cover: preserve the university/course presentation, leave identity blank.
-    for _ in range(2):
-        doc.add_paragraph()
-    p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    font(p.add_run("海 南 大 学"), 22, bold=True, cn=HEAD)
-    p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    font(p.add_run("《生物医学传感检测与仪器》课程项目报告"), 11.5)
-    p = doc.add_paragraph(style="Title"); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.paragraph_format.space_before = Pt(50)
-    p.paragraph_format.space_after = Pt(0)
-    font(p.add_run("基于深度学习的 ECG"), 20, bold=True, cn=HEAD)
-    p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    font(p.add_run("心搏异常筛查与去噪"), 20, bold=True, cn=HEAD)
-    p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.paragraph_format.space_before = Pt(8)
-    font(p.add_run("ECG Beat Abnormality Screening and Denoising"), 9.5, italic=True)
-    p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.paragraph_format.space_before = Pt(22)
-    font(p.add_run("面向 OpenECG 的离线分析与接入设计"), 10.5)
-    cover_rows = [["姓    名", "________________"], ["学    号", "________________"],
-                  ["专    业", "生物医学工程"], ["指导教师", "________________"],
-                  ["日    期", "2026 年 10 月"]]
-    t = doc.add_table(rows=0, cols=2); t.alignment = WD_TABLE_ALIGNMENT.CENTER
-    for label, value in cover_rows:
-        row = t.add_row(); row._tr.get_or_add_trPr().append(OxmlElement("w:cantSplit"))
-        for ci, (cell, text) in enumerate(zip(row.cells, (label + "：", value))):
-            cell.width = Cm(3.4 if ci == 0 else 7.2)
-            cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-            p = cell.paragraphs[0]
-            p.alignment = WD_ALIGN_PARAGRAPH.RIGHT if ci == 0 else WD_ALIGN_PARAGRAPH.LEFT
-            font(p.add_run(text), 10.5, cn=HEAD if ci == 0 else CN)
-    manifest["tables"].append({"id": "cover", "caption": "封面信息", "headers": [],
-                                "rows": [[r[0] + "：", r[1]] for r in cover_rows]})
-
-    section = doc.add_section(WD_SECTION.NEW_PAGE)
-    configure_section(section)
-    pg = OxmlElement("w:pgNumType"); pg.set(qn("w:start"), "1"); section._sectPr.append(pg)
-    hp = section.header.paragraphs[0]; hp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    font(hp.add_run("海南大学 · 生物医学传感检测与仪器"), 8)
-    fp = section.footer.paragraphs[0]; fp.alignment = WD_ALIGN_PARAGRAPH.CENTER; page_number(fp)
+    # Public reproduction has blank fields; local submissions may keep a cover.
+    if cover_from is None:
+        for _ in range(2):
+            doc.add_paragraph()
+        p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        font(p.add_run("海 南 大 学"), 22, bold=True, cn=HEAD)
+        p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        font(p.add_run("《生物医学传感检测与仪器》课程项目报告"), 11.5)
+        p = doc.add_paragraph(style="Title"); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.space_before = Pt(50)
+        p.paragraph_format.space_after = Pt(0)
+        font(p.add_run("基于深度学习的 ECG"), 20, bold=True, cn=HEAD)
+        p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        font(p.add_run("心搏异常筛查与去噪"), 20, bold=True, cn=HEAD)
+        p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.space_before = Pt(8)
+        font(p.add_run("ECG Beat Abnormality Screening and Denoising"), 9.5, italic=True)
+        p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.space_before = Pt(22)
+        font(p.add_run("面向 OpenECG 的离线分析与接入设计"), 10.5)
+        cover_rows = [["姓    名", "________________"], ["学    号", "________________"],
+                      ["专    业", "生物医学工程"], ["指导教师", "________________"],
+                      ["日    期", "2026 年 10 月"]]
+        for label, value in cover_rows:
+            p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p.paragraph_format.space_before = Pt(8)
+            font(p.add_run(label + "："), 10.5, cn=HEAD)
+            font(p.add_run(value), 10.5)
+        section = doc.add_section(WD_SECTION.NEW_PAGE)
+        configure_section(section)
+        pg = OxmlElement("w:pgNumType"); pg.set(qn("w:start"), "1"); section._sectPr.append(pg)
+        hp = section.header.paragraphs[0]; hp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        font(hp.add_run("海南大学 · 生物医学传感检测与仪器"), 8)
+        fp = section.footer.paragraphs[0]; fp.alignment = WD_ALIGN_PARAGRAPH.CENTER; page_number(fp)
 
     heading("摘  要")
     abstract = (
         "单导联 ECG 的异常心搏比例低，噪声和跨记录差异会同时影响筛查结果。本文构建离线预处理、"
         f"R 峰对齐心搏切分、{integer(binary_cost['params'])} 参数二分类 CNN 与 {integer(denoiser_cost['params'])} 参数 DnCNN，"
-        "并给出面向 OpenECG 的接入设计。在该项目的模拟信号流程上完成接入验证，"
+        "并给出面向 OpenECG 的接入设计。参考其思路构建自定义合成信号并完成流程验证，"
         f"{int(openecg['n_beats'])} 拍全部判为正常。排除与测试记录 202 属于同一受试者的记录 201 后，"
         f"在 {integer(oof['oof_n'])} 个心搏上开展五折记录级交叉验证，合并 OOF AUC 为 {number(oof['oof_auc'])}；"
         f"最终模型在 DS2 的 {integer(binary['n'])} 个心搏上 AUC 为 {number(binary['auc'])}。"
         f"OOF 规则选出的阈值 {number(bpoint['threshold'])} 在 DS2 上取得 Se {percent(bpoint['sensitivity'])}、"
         f"Sp {percent(bpoint['specificity'])}、Acc {percent(bpoint['accuracy'])}、Macro-F1 {number(bpoint['macro_f1'])}。"
-        "OOF 的 Sp≥90% 约束未能跨记录保持，揭示了概率校准迁移的限制。去噪、四分类与演示均在排除 201 后重跑，"
+        "OOF 的 Sp≥90% 约束未能在 DS2 保持，提示跨记录及模型重拟合后的分数分布变化。去噪、四分类与演示均在排除 201 后重跑，"
         "其收益与误差按当前实测结果分别报告。"
         f"在 DS2 全量软件在环仿真中，设备链路整数时延对齐后的 AUC 为 {number(sil['sil_aligned']['auc'])}，"
         "未恢复理想通路的排序能力，且固定工作点发生迁移，说明设备域需另行校准，尚不能替代实物联调。"
-        "组件消融表明损失主要来自 AFE 的串联低通。"
+        "组件消融显示性能差异主要随 AFE 的引入出现，尚未分别确定幅频、相频响应和波形改变的贡献。"
     )
     para(abstract, key="abstract", source="binary/oof/cost/sil")
     p = doc.add_paragraph(); font(p.add_run("关键词："), bold=True, cn=HEAD)
-    font(p.add_run("ECG；AUC；记录级交叉验证；概率校准；DnCNN；OpenECG"))
+    font(p.add_run("ECG；AUC；记录级交叉验证；工作点迁移；DnCNN；OpenECG"))
 
     heading("1  项目背景与目标")
     para("可穿戴心电与 Holter 数据需要自动筛查辅助复核。单看总体准确率容易掩盖少数异常心搏的漏检；"
          "同一记录同时进入训练和验证，也会使模型选择过于乐观。本项目围绕两项可复核的问题展开："
          "形态网络在未见记录上的排序能力如何，以及去噪后重建质量的变化是否能转化为同一阈值下的分类收益。")
-    para("OpenECG 项目目前以心电信号模拟与绘图示例为主，采集与硬件部分仍在开发[6]。"
+    para("OpenECG 项目提供心电信号模拟与绘图示例，其中 NeuroKit2 示例还包含预处理和 R 峰检测，采集与硬件部分仍在开发[6]。"
          "本项目已经运行的功能为 WFDB 文件读取、离线滤波、心搏切分、神经网络评价与演示，"
-         "并在其模拟信号流程上新增了接入模块；硬件采集、BLE 通信和上位机实时接口属于接入设计，"
+         "并参考上游思路完成自定义合成信号流程验证；硬件采集、BLE 通信和上位机实时接口属于接入设计，"
          "尚未与实体设备联调。研究目标是提供可重复的软件实验与误差分析，不以硬件部署或临床验证为结论。")
     para("主要工作包括：统一排除记录 201 的数据口径；以记录级 OOF 预测选择并冻结二分类工作点；"
          "在冻结模型上比较原始含噪、传统滤波和 DnCNN 三种处理；重训四分类探索模型并更新演示；"
          "测量桌面 CPU 开销，并区分实测结果与部署估算。")
-    para("另在 OpenECG 的模拟信号流程上完成接入验证（4.7），并以软件在环方式检验候选 AFE、ADC 与分包重组"
+    para("另以参考 OpenECG 思路的自定义合成信号检验处理流程（4.7），并以软件在环方式检验候选 AFE、ADC 与分包重组"
          "对冻结模型的影响（4.6）；所用链路参数为仿真设定，未进行实物联调。")
 
     heading("2  数据与评价方案")
@@ -576,7 +591,8 @@ def build(root: Path, data_path: Path, out: Path):
     para(f"主阈值 {number(bpoint['threshold'])} 在 OOF 上满足 Sp {percent(oof_point['specificity'])}、Se {percent(oof_point['sensitivity'])}；"
          f"迁移至 DS2 后，Se 为 {percent(bpoint['sensitivity'])}、Sp 为 {percent(bpoint['specificity'])}、Acc 为 {percent(bpoint['accuracy'])}、"
          f"Macro-F1 为 {number(bpoint['macro_f1'])}。OOF 的 Sp≥90% 约束在 DS2 只兑现到 {percent(bpoint['specificity'])}，"
-         "说明当前模型的概率校准不能直接跨记录迁移。这是需披露的发现，本轮没有回看 DS2 去补选阈值。",
+         "说明 OOF 选定阈值未保持目标特异性，提示跨记录及模型重拟合后的分数分布变化。"
+         "概率校准还需检验预测概率与实际发生频率的对应关系，本实验未作专门评价；本轮没有回看 DS2 去补选阈值。",
          key="primary_results", source="binary/oof")
     labels = [("sp90_max_se", "OOF Sp≥90% 主点"), ("youden_max", "OOF Youden 点"), ("default_050", "默认点")]
     workpoint_rows = []
@@ -627,7 +643,7 @@ def build(root: Path, data_path: Path, out: Path):
                                     f"F1 {number(r['raw']['macro_f1'])}→{number(r['denoised']['macro_f1'])}")
     para("15 dB 的重建结果单独观察：" + "；".join(reconstruction_parts) + "。负 ΔSNR 或 RMSE 增大意味着该重建指标变差，可能包含过平滑；不能只依据输出曲线更平滑判断质量。",
          key="noise_15db_reconstruction", source="noise")
-    para("同一 15 dB 条件的分类结果为：" + "；".join(classification_parts) + "。分类改善与重建退化可以同时发生，二者不能写成同一结论。完整 RMSE 与 AUC 见表 A2。",
+    para("同一 15 dB 条件的分类结果为：" + "；".join(classification_parts) + "。分类改善与重建退化可以同时发生，二者不能写成同一结论。完整 RMSE 与 AUC 见表 A1。",
          key="noise_15db_classification", source="noise")
     figure("fig04_denoising_example.png", 11.5, "图 7  本轮 DnCNN 在固定含噪输入上的波形重建示例", "figure7")
     figure("fig05b_denoising_snr.png", 13.0, "图 8  本轮九条件输入 输出 SNR 与 ΔSNR", "figure8")
@@ -658,7 +674,9 @@ def build(root: Path, data_path: Path, out: Path):
         table7_rows.append([record, integer(r["n"]), integer(r["abnormal"]), integer(get_record(r, "fn", "false_negative")),
                             percent(r["sensitivity"]), percent(r["specificity"])])
     table("table7", ["记录", "心搏数", "异常数", "漏检数", "Se", "Sp"], table7_rows,
-          [1.8, 2.6, 2.6, 2.6, 2.9, 2.9], f"表 7  当前缓存预测在主阈值 {number(bpoint['threshold'])} 下的逐记录检出", fs=8.0)
+          [1.8, 2.6, 2.6, 2.6, 2.9, 2.9], f"表 7  主阈值 {number(bpoint['threshold'])} 下部分代表性记录的异常检出", fs=8.0)
+    para("表 7 固定展示六条记录，便于对照高检出、较多漏检与低特异性等不同情况；该列表并非随机抽样，也未按异常数排序。"
+         "全部 22 条 DS2 记录的结果见仓库 results/workpoint_cv_v2/ds2_per_record_primary.json。", first=False, size=8.8)
     para(f"主点在 DS2 共检出异常 {integer(bpoint['tp'])} 拍、漏检 {integer(bpoint['fn'])} 拍，同时产生 {integer(bpoint['fp'])} 拍正常心搏误报。"
          "表 7 的差异说明总体 AUC 或平均敏感度不能替代逐记录评价。单拍形态、节律信息缺失、噪声以及记录间分布差异均可能参与形成误差，"
          "本实验尚未通过消融将其影响分开。",
@@ -709,7 +727,8 @@ def build(root: Path, data_path: Path, out: Path):
          "用于分析前端相位影响；实际设备需由时间戳或检测器完成补偿。"
          f"理想通路与原冻结缓存逐拍一致，最大概率偏差为 {sil['ideal_matches_frozen_cache_max_dev']:.1e}（浮点精度量级）。",
          key="sil_cache_and_alignment", source="sil/run_sil.py; results/sil/sil_metrics.json")
-    para("本节为额外的四通路推理与理想通路复核。发现整数移位方向错误后，仅修正该分支并重跑 SIL；"
+    para("本节为额外的四通路推理与理想通路复核。时延对齐按“正 lag 表示设备信号滞后”实现："
+         "对设备信号左移相应样本数，边界用端值填充；该分支只用于分析前端相位影响，不参与阈值选择。"
          "原干净 DS2 主评价的一次推理审计、模型、阈值和缓存均保持不变，未据仿真结果重新选点。")
     sil_rows = []
     for label, key in [("理想", "ideal"), ("仅量化+链路", "quant_link"),
@@ -723,13 +742,13 @@ def build(root: Path, data_path: Path, out: Path):
     ideal, quant_link, device, aligned = sil["ideal"], sil["quant_link"], sil["sil"], sil["sil_aligned"]
     para(f"正确整数对齐后，AUC 相对理想通路变化为 {aligned['auc'] - ideal['auc']:+.4f}，"
          f"由 {number(ideal['auc'])} 降至 {number(aligned['auc'])}，未恢复理想通路的排序能力。"
-         "组件消融显示，该损失主要不是量化与传输造成的：仅做 11 bit 量化与 1% 丢包时，"
+         "组件消融中，仅做 11 bit 量化与 1% 丢包时，"
          f"AUC 为 {number(quant_link['auc'])}（{quant_link['auc'] - ideal['auc']:+.4f}），"
          f"Se 为 {percent(quant_link['sensitivity'])}，与理想通路的 {number(ideal['auc'])} / {percent(ideal['sensitivity'])} 基本持平；"
          f"加入 AFE 后 AUC 降至 {number(device['auc'])}（{device['auc'] - ideal['auc']:+.4f}），"
-         f"Se 降至 {percent(device['sensitivity'])}。因此 40 Hz 抗混叠低通与数字带通串联造成的双重高频衰减是主要来源，"
-         "量化与分包丢失不是主因。"
-         f"整数时延对齐后 AUC 仍为 {number(aligned['auc'])}，说明剩余差异不能由固定延迟解释，还包含频率相关的相位与形态改变。",
+         f"Se 降至 {percent(device['sensitivity'])}。性能差异主要随 AFE 的引入出现，可能与额外的幅频、相频响应及波形改变有关。"
+         "该对照同时改变了高通、低通及因果相位响应，尚未分别确定各因素的贡献，不能将损失单独归因于串联低通。"
+         f"整数时延对齐后 AUC 仍为 {number(aligned['auc'])}，说明本次固定整数平移不足以消除剩余差异。",
          key="sil_auc_conclusion", source="results/sil/sil_metrics.json")
     para(f"不补偿时，AUC 变化为 {device['auc'] - ideal['auc']:+.4f}，"
          f"Se 变化为 {(device['sensitivity'] - ideal['sensitivity']) * 100:+.1f} 个百分点。"
@@ -741,39 +760,40 @@ def build(root: Path, data_path: Path, out: Path):
          f"Sp 由 {percent(ideal['specificity'])} 变为 {percent(aligned['specificity'])}，"
          f"阳性判定比例由 {percent(sil['probability_summary']['ideal']['predicted_positive_rate'])} 变为 "
          f"{percent(sil['probability_summary']['sil_aligned']['predicted_positive_rate'])}，"
-         "显示概率分布和固定工作点发生迁移。设备链路上的工作点需在另设的训练侧校准数据上重新校准，"
-         "与 4.1 的跨记录校准迁移现象相呼应；本轮继续保留冻结阈值，不使用 DS2 补选工作点。",
+         "显示分数分布和固定工作点发生迁移。设备链路上的工作点需在另设的训练侧开发数据上重新选择并独立验证，"
+         "与 4.1 的目标特异性未保持现象相呼应；概率校准仍需专门评价。本轮继续保留冻结阈值，不使用 DS2 补选工作点。",
          key="sil_calibration_conclusion", source="results/sil/sil_metrics.json")
     para("仿真边界：源数据已是 360 Hz 数字记录，未模拟采样前混叠；丢包率、包长与缓冲时间等均为设定值，"
          "并非设备实测。该实验属于软件在环仿真，数字预处理仍按离线方式运行，不是实物联调，"
          "也不构成端到端硬件实时性证明。",
          key="sil_limits", source="sil/README.md,afe.py,link.py")
 
-    heading("4.7  在 OpenECG 模拟信号上的接入验证", 2)
+    heading("4.7  参考 OpenECG 思路的自定义合成信号流程验证", 2)
     prob = openecg["prob_abnormal"]
-    para("上游 OpenECG 仓库目前只有一个 README 和两个 Jupyter notebook：分别用 NeuroKit2 与 numpy 高斯模型"
-         "生成 4 s / 1000 Hz / 70 bpm 与 10 s / 1000 Hz / 60 bpm 的模拟心电并绘图；仓库中没有滤波、"
-         "R 峰检测与心搏分类，也没有采集端代码。本项目在其流程末端新增 openecg_ext/analysis 模块："
-         "simulate.py 复刻其高斯 P/QRS/T 模型，pipeline.py 完成 1000→360 Hz 重采样、0.5–40 Hz 零相位带通"
-         "与 60 Hz 陷波、R 峰检测与 256 点切分，run_demo.py 加载与 4.6 相同的冻结二分类模型与阈值。",
+    para("上游 OpenECG 仓库提供两个 Jupyter notebook：分别用 NeuroKit2 与 numpy 高斯模型生成模拟心电。"
+         "其中 NeuroKit2 示例调用 nk.ecg_process 完成预处理和 R 峰检测；上游尚未包含本项目的训练分类器和硬件采集实现[6]。"
+         "本项目的 openecg_ext/analysis 模块参考其高斯 P/QRS/T 建模思路，使用修改后的幅值、宽度和时序参数生成自定义信号，"
+         "并未直接读取上游运行输出。例如 R 波高斯宽度由 0.03 s 改为 0.008 s，幅值由 1.5 改为 1.0；合成幅值未作物理标定。"
+         "pipeline.py 完成 1000→360 Hz 重采样、0.5–40 Hz 零相位带通与 60 Hz 陷波、R 峰检测及 256 点切分，"
+         "run_demo.py 加载与 4.6 相同的冻结二分类模型与阈值。",
          key="openecg_integration", source="openecg_ext/analysis/*.py; results/openecg_demo/openecg_demo.json")
     figure("openecg_sim.png", 14.0,
-           "图 14  OpenECG 模拟信号的三段处理：模拟波形、滤波与 R 峰、切分心搏与分类", "figure14")
+           "图 14  自定义合成信号的三段处理：模拟波形、滤波与 R 峰、切分心搏与分类", "figure14")
     para(f"在 {openecg['duration_s']:.0f} s、{openecg['heart_rate_bpm_target']:.0f} bpm 的模拟片段上，"
          f"R 峰全部检出（{openecg['n_peaks']} 个，RR = {openecg['mean_rr_s']:.3f} s，"
          f"实测心率 {openecg['heart_rate_bpm_measured']:.1f} bpm）；{openecg['n_beats']} 拍的异常概率为 "
          f"{min(prob):.2f}–{max(prob):.2f}，均低于阈值 {number(openecg['threshold'])}，"
-         f"判为异常 {openecg['n_abnormal']} 拍，未出现误报。该结果说明现有软件可直接消费上游的模拟信号"
-         "与时序；合成波形不用于分类性能评价，性能仍以 DS2 的 49,705 个真实心搏为准。"
-         "本节只验证接入流程能否跑通，不构成对该上游项目功能的等价性声明。",
+         f"判为异常 {openecg['n_abnormal']} 拍。该结果说明自定义合成输入下的数据转换、检测、切分和模型调用流程能够运行，"
+         "不能作为上游原始波形的直接接入验证。合成波形不用于分类性能评价，性能仍以 DS2 的 49,705 个真实心搏为准。",
          key="openecg_result", source="results/openecg_demo/openecg_demo.json")
 
     heading("5  讨论与局限")
     para(f"本轮主要结果是 OOF AUC {number(oof['oof_auc'])} 与 DS2 AUC {number(binary['auc'])}，同时必须保留 OOF 与 DS2 的差异。"
          "较少的每折训练记录使 OOF 结果可能更保守，记录难度和概率尺度也会变化；没有训练量消融时，不能把最终模型较高的 AUC 解释为单一因素的因果收益。"
          "准确率受阴性比例影响，冻结工作点仍存在大量误报和漏检。")
-    para(f"OOF Sp≥90% 到 DS2 Sp {percent(bpoint['specificity'])} 的下降揭示了当前概率校准无法直接跨记录迁移。"
-         "这项发现应作为结果报告，而非通过在 DS2 上重新选择阈值来修补。后续若研究校准，应另设训练侧校准方案并使用新的独立评价数据。"
+    para(f"OOF 选定阈值在 DS2 上仅达到 Sp {percent(bpoint['specificity'])}，未保持 Sp≥90% 的目标，"
+         "提示跨记录及模型重拟合后的分数分布变化。该工作点现象与概率校准评价应予区分；"
+         "后续如研究概率校准，需专门评价预测概率与实际发生频率的对应关系，并另设训练侧校准方案与独立评价数据。"
          "本轮保留工作点冻结、一次干净 DS2 推理缓存及未回看补选阈值的完整记录。")
     improvements = [r["denoised"]["macro_f1"] - r["raw"]["macro_f1"] for r in noise_rows]
     wins = sum(v > 0 for v in improvements); losses = sum(v < 0 for v in improvements)
@@ -790,8 +810,8 @@ def build(root: Path, data_path: Path, out: Path):
          f"二分类 OOF AUC 为 {number(oof['oof_auc'])}，DS2 AUC 为 {number(binary['auc'])}；主阈值 {number(bpoint['threshold'])} 的 DS2 "
          f"Se/Sp/Acc/Macro-F1 分别为 {percent(bpoint['sensitivity'])}/{percent(bpoint['specificity'])}/{percent(bpoint['accuracy'])}/{number(bpoint['macro_f1'])}。"
          f"软件在环整数时延对齐后的 AUC 为 {number(sil['sil_aligned']['auc'])}，仍低于理想通路且冻结工作点发生迁移，"
-         "提示单一时延补偿不足，设备链路需要独立校准与实物联调。"
-         "当前证据支持离线软件实验与校准迁移问题的分析，不支持实时硬件部署或临床诊断结论。",
+         "提示单一时延补偿不足，设备链路上的工作点需要独立验证，并进一步开展实物联调。"
+         "当前证据支持离线软件实验与工作点迁移现象的分析，不支持实时硬件部署或临床诊断结论。",
          key="conclusion", source="binary/oof/sil")
 
     heading("参考文献")
@@ -811,37 +831,32 @@ def build(root: Path, data_path: Path, out: Path):
         para(f"[{index}] {text}", first=False, size=8.7, before=2, after=2)
 
     heading("数据与实现资源")
-    resource_rows = data.get("resource_links", [
+    resource_rows = [
         ["MIT-BIH", "https://physionet.org/content/mitdb/1.0.0/"],
         ["NSTDB", "https://physionet.org/content/nstdb/1.0.0/"],
         ["OpenECG", "https://github.com/jwlee95/OpenECG"],
-        ["torch_ecg", "https://github.com/DeepPSP/torch_ecg"],
-        ["1D 模型参考", "https://github.com/StChenHaoGitHub/1D-deeplearning-model-pytorch"],
         ["PyTorch", "https://pytorch.org/"],
-    ])
+    ]
     table("table10", ["资源", "链接"], resource_rows, [3.2, 13.2], "表 10  数据集与实现资源链接", fs=7.7, left_columns=(1,))
 
-    heading("附录 A  代码与运行")
-    para("提交代码包包含本轮源码、采用的模型权重、当前图表、原始指标 JSON 与冻结记录。"
-         "已完成的实验入口设置防重复标记；重建报告读取缓存，不再次运行干净 DS2 推理。完整训练需在新的实验输出目录中按 README 执行，"
-         "不能删除冻结标记后把新一轮测试结果覆盖为本轮结果。")
-    commands = reproduction["commands"]
-    para("\n".join(commands), first=False, size=8.2, align=WD_ALIGN_PARAGRAPH.LEFT, before=3, after=3)
-    table("tableA1", ["文件/目录", "作用"], reproduction["files"], [7.0, 9.4], "表 A1  本轮源码 结果与复现文件", fs=7.7, left_columns=(0, 1))
+    heading("附录 A  补充结果")
+    para("正文表 5 汇总重建 SNR 与三种处理的 Macro-F1；九条件的重建 RMSE 与分类 AUC 汇总如下。"
+         "所有结果仅用于课程学习和研究分析，不构成临床诊断建议。")
     appendix_rows = []
     for kind, name in KINDS:
         for snr in (5, 10, 15):
             r = noise_by_key[kind, snr]
             appendix_rows.append([f"{name}/{snr}", number(r["rmse_raw"]), number(r["rmse_denoised"]),
                                   number(r["raw"]["auc"]), number(r["denoised"]["auc"])])
-    appendix_note = para("完整精度阈值、划分索引和所有模型哈希以提交 JSON 为准。DS2 完整阈值曲线标注为探索性分析，"
-                        "不用于重新选择工作点；所有结果仅用于课程学习和研究分析，不构成临床诊断建议。", first=False, size=8.8)
-    appendix_note.paragraph_format.keep_with_next = True
-    appendix_note.paragraph_format.keep_together = True
-    appendix_note.paragraph_format.line_spacing = 1.12
-    appendix_note.paragraph_format.space_after = Pt(2)
-    table("tableA2", ["噪声/SNR", "RMSE未处理", "RMSE DnCNN", "AUC未处理", "AUC DnCNN"], appendix_rows,
-          [3.2, 3.3, 3.3, 3.3, 3.3], "表 A2  本轮九条件的重建 RMSE 与分类 AUC", fs=7.8)
+    table("tableA1", ["噪声/SNR", "RMSE未处理", "RMSE DnCNN", "AUC未处理", "AUC DnCNN"], appendix_rows,
+          [3.2, 3.3, 3.3, 3.3, 3.3], "表 A1  九条件的重建 RMSE 与分类 AUC", fs=7.8)
+
+    heading("附录 B  代码与数据仓库")
+    para("代码、模型权重、冻结预测缓存与本报告所用图表见 GitHub 仓库："
+         "https://github.com/HZH507/openecg-beat-screening。", align=WD_ALIGN_PARAGRAPH.LEFT)
+    para("其中 openecg_ext/ 为 4.7 节参考 OpenECG 思路的自定义合成信号流程模块，sil/ 为 4.6 节的软件在环链路仿真；"
+         "数据集 MIT-BIH 与 NSTDB 不随仓库分发，获取方式见仓库内 data/README.md。"
+         "已有缓存可用于核验结果与重建报告，无需重新训练或推理；具体步骤与文件哈希见仓库说明。")
 
     out.parent.mkdir(parents=True, exist_ok=True)
     doc.save(out)
@@ -856,11 +871,13 @@ def main():
     ap.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     ap.add_argument("--data", type=Path)
     ap.add_argument("--output", type=Path)
+    ap.add_argument("--cover-from", "--cover-source", dest="cover_from", type=Path,
+                    help="Optional local DOCX whose cover is preserved; omitted means blank identity fields")
     args = ap.parse_args()
     root = args.root.resolve()
     data_path = args.data or root / "results" / "report_final" / "report_data.json"
     out = args.output or root / "report" / "ECG_课程报告_标准版.docx"
-    build(root, data_path, out)
+    build(root, data_path, out, cover_from=args.cover_from)
 
 
 if __name__ == "__main__":

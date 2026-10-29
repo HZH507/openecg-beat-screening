@@ -1,0 +1,3 @@
+# Frozen provenance checks hash exact file bytes, including line endings.
+# Preserve the original mixed LF/CRLF files in clones, archives and code packages.
+* -text

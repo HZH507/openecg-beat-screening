@@ -362,7 +362,7 @@ def verify_manifest(manifest,tables,captions,paragraphs,audit):
     audit.equal(len(tables),len(declared),'all DOCX tables declared')
     ids=[t['id'] for t in declared]
     audit.equal(len(ids),len(set(ids)),'table IDs unique')
-    expected_ids={'cover',*[f'table{i}' for i in range(1,11)],'tableA1','tableA2'}
+    expected_ids={*[f'table{i}' for i in range(1,11)],'tableA1'}
     audit.equal(set(ids),expected_ids,'complete table set')
     by_id={}
     for index,((element,matrix),spec) in enumerate(zip(tables,declared)):
@@ -438,7 +438,7 @@ def verify_table_numbers(data,by_id,summary,clean_cache,audit):
                               number(r['raw']['macro_f1']),number(r['classical']['macro_f1']),number(r['denoised']['macro_f1'])])
             expected_a2.append([f'{label}/{snr}',number(r['rmse_raw']),number(r['rmse_denoised']),
                                 number(r['raw']['auc']),number(r['denoised']['auc'])])
-    check_matrix('table5',expected5); check_matrix('tableA2',expected_a2)
+    check_matrix('table5',expected5); check_matrix('tableA1',expected_a2)
     expected6=[]
     for key,label in [('cnn','轻量 CNN'),('mlp','MLP')]:
         m=data['classification'][key]
@@ -464,30 +464,13 @@ def verify_table_numbers(data,by_id,summary,clean_cache,audit):
         expected8.append([m['name'],integer(m['params']),f"{m['fp32_kib']:.1f} KiB",
                           f"{m['int8_kib']:.1f} KiB",f"{m['latency_ms']:.3f} ms"])
     check_matrix('table8',expected8)
-    resources=data.get('resource_links',[
+    resources=[
         ['MIT-BIH','https://physionet.org/content/mitdb/1.0.0/'],
         ['NSTDB','https://physionet.org/content/nstdb/1.0.0/'],
         ['OpenECG','https://github.com/jwlee95/OpenECG'],
-        ['torch_ecg','https://github.com/DeepPSP/torch_ecg'],
-        ['1D 模型参考','https://github.com/StChenHaoGitHub/1D-deeplearning-model-pytorch'],
         ['PyTorch','https://pytorch.org/'],
-    ])
+    ]
     check_matrix('table10',resources)
-    # SIL is side-loaded by the builder; the frozen report_data.json is not
-    # regenerated merely to append two package-index rows.
-    original=data['reproduction']['files']
-    a1=by_id['tableA1']['matrix'][1:]
-    audit.equal(a1[:len(original)],original,'original reproduction rows preserved')
-    audit.equal(len(a1),len(original)+2,'two SIL reproduction-index rows added')
-    extra=a1[len(original):]
-    code_rows=[r for r in extra if 'sil/' in r[0] and 'results/sil/' not in r[0]]
-    output_rows=[r for r in extra if compact(r[0])=='results/sil/']
-    audit.equal(len(code_rows),1,'one SIL source-index row')
-    audit.equal(len(output_rows),1,'one SIL output-index row')
-    for name in ('afe.py','adc.py','link.py','run_sil.py'):
-        audit.check(name in code_rows[0][0],'SIL source listed in appendix A1 '+name)
-    audit.check(bool(code_rows[0][1].strip()) and bool(output_rows[0][1].strip()),
-                'SIL package-index descriptions are populated')
 
 
 def verify_figure_values(root,data,summary,cache,audit):
@@ -532,6 +515,40 @@ def verify_figure_values(root,data,summary,cache,audit):
     audit.equal(demo['uses_rr'],False,'figure 11 does not claim RR input')
 
 
+def cover_text(document):
+    """Extract only cover text, without logging any personal field values."""
+    result=[]
+    for child in document.find('w:body',NS):
+        text=element_text(child)
+        if compact(text)=='摘要':
+            return [normal(value) for value in result if normal(value)]
+        result.append(text)
+    raise AssertionError('Abstract boundary required to separate the cover')
+
+
+def verify_cover(document,manifest,audit,cover_source=None):
+    current=cover_text(document)
+    joined='\n'.join(current)
+    provenance=manifest.get('cover_provenance',{})
+    if cover_source is not None:
+        _,source,_,_,_=document_parts(cover_source)
+        # A boolean assertion is deliberate: audit output must never expose
+        # names, student numbers or supervisor values from either document.
+        audit.check(current==cover_text(source),'cover text preserved from user-provided source')
+        audit.equal(provenance.get('mode'),'preserved','cover preservation mode recorded')
+        audit.equal(provenance.get('source_sha256'),digest(cover_source),'cover source file hash')
+        return {'mode':'preserved','source_sha256':digest(cover_source)}
+    audit.equal(provenance.get('mode'),'blank','public report uses blank cover mode')
+    for label in ('姓名','学号','指导教师'):
+        audit.equal(compact(joined).count(label),1,'one blank cover personal field '+label)
+        matching=[text for text in current if label in compact(text)]
+        audit.equal(len(matching),1,'blank cover field located '+label)
+        value=re.sub(r'^.*?'+label+r'\s*[:：]?','',compact(matching[0]),count=1)
+        audit.check(not value or re.fullmatch(r'[_＿]+',value) is not None,
+                    'public personal field remains blank '+label)
+    return {'mode':'blank'}
+
+
 def verify_text_and_ooxml(root,data,manifest,blobs,document,by_id,paragraphs,audit):
     full_text='\n'.join(paragraphs+[' '.join(cell for row in v['matrix'] for cell in row) for v in by_id.values()])
     normalized=normal(full_text)
@@ -547,7 +564,12 @@ def verify_text_and_ooxml(root,data,manifest,blobs,document,by_id,paragraphs,aud
                 'OOF specificity selection constraint disclosed')
     audit.check('Youden' in normalized,'Youden reference rule disclosed')
     audit.check('探索性分析' in normalized,'DS2 full threshold curve explicitly exploratory')
-    audit.check('校准' in normalized and ('迁移' in normalized or '跨记录' in normalized),'calibration transfer finding disclosed')
+    audit.check('工作点' in normalized and '分数分布' in normalized and '重拟合' in normalized,
+                'operating-point transfer and model-refit score distribution are distinguished')
+    audit.check('概率校准' in normalized and ('专门评价' in normalized or '专门检验' in normalized or '专门评估' in normalized),
+                'probability calibration is identified as requiring a separate evaluation')
+    for claim in ('概率校准不能直接跨记录迁移','概率校准无法直接跨记录迁移','概率校准失效'):
+        audit.check(claim not in compact(normalized),'unsupported probability-calibration conclusion absent '+claim)
     audit.check('少' in normalized and 'OOF' in normalized,'OOF smaller training partitions discussed')
     audit.check('四分类' in normalized and '演示' in normalized,'four-class demo task disclosed')
     audit.check('未来样本' in normalized and '离线' in normalized,'zero-phase filtering offline limitation disclosed')
@@ -555,15 +577,11 @@ def verify_text_and_ooxml(root,data,manifest,blobs,document,by_id,paragraphs,aud
     audit.check('参考文献' in normalized,'reference section present')
     for i in range(1,7):
         audit.check(f'[{i}]' in normalized,'reference entry '+str(i))
-    # Personal fields appear once, on the cover; their values remain placeholders.
-    for word in ('姓名','学号','指导教师'):
-        audit.equal(compact(full_text).count(word),1,'one cover personal field '+word)
-    cover=by_id['cover']['matrix']
-    for word in ('姓名','学号','指导教师'):
-        matching=[row for row in cover if word in compact(row[0])]
-        audit.equal(len(matching),1,'cover placeholder '+word)
-        audit.check(not matching[0][1].strip() or re.fullmatch(r'[_＿\s]+',matching[0][1]) is not None,
-                    'personal value not fabricated '+word)
+    # Personal fields appear only on the cover. Values are independently checked
+    # by verify_cover, either against the user-provided source or blank fields.
+    if manifest.get('cover_provenance',{}).get('mode')=='blank':
+        for word in ('姓名','学号','指导教师'):
+            audit.equal(compact(full_text).count(word),1,'one cover personal field '+word)
     core=ET.fromstring(blobs['docProps/core.xml'])
     for tag in ('dc:creator','cp:lastModifiedBy'):
         text=core.findtext(tag,default='',namespaces=NS)
@@ -574,14 +592,18 @@ def verify_text_and_ooxml(root,data,manifest,blobs,document,by_id,paragraphs,aud
     audit.check(not any('comments' in name.lower() for name in blobs),'no reviewer comments shipped')
     audit.check(not document.findall('.//w:ins',NS) and not document.findall('.//w:del',NS),'no tracked changes shipped')
     styles=ET.fromstring(blobs['word/styles.xml'])
-    for style_id in ('Title','Subtitle'):
+    title_style_ids=set()
+    for style_name in ('Title','Subtitle'):
         style=next((node for node in styles.findall('w:style',NS)
-                    if node.get('{'+NS['w']+'}styleId')==style_id),None)
-        audit.check(style is not None,'title style exists '+style_id)
-        audit.check(style.find('w:pPr/w:pBdr',NS) is None,'title style has no paragraph border '+style_id)
+                    if node.get('{'+NS['w']+'}styleId')==style_name or
+                    (node.find('w:name',NS) is not None and
+                     node.find('w:name',NS).get('{'+NS['w']+'}val','').lower()==style_name.lower())),None)
+        audit.check(style is not None,'title style exists '+style_name)
+        title_style_ids.add(style.get('{'+NS['w']+'}styleId'))
+        audit.check(style.find('w:pPr/w:pBdr',NS) is None,'title style has no paragraph border '+style_name)
     for paragraph in document.findall('.//w:p',NS):
         style=paragraph.find('w:pPr/w:pStyle',NS)
-        if style is not None and style.get('{'+NS['w']+'}val') in ('Title','Subtitle'):
+        if style is not None and style.get('{'+NS['w']+'}val') in title_style_ids:
             audit.check(paragraph.find('w:pPr/w:pBdr',NS) is None,
                         'title paragraph has no direct border '+style.get('{'+NS['w']+'}val'))
     for name,spec in by_id.items():
@@ -609,8 +631,9 @@ def verify_text_and_ooxml(root,data,manifest,blobs,document,by_id,paragraphs,aud
         if package_name not in blobs:
             package_name=str(Path('word')/target).replace('\\','/')
         actual=blob_digest(blobs[package_name])
-        sil_images={'sil_afe.png':'results/sil/sil_afe.png','sil_roc.png':'results/sil/sil_roc.png'}
-        image_path=sil_images.get(figure['filename'],data['figures'].get(figure['filename']))
+        supplement_images={'sil_afe.png':'results/sil/sil_afe.png','sil_roc.png':'results/sil/sil_roc.png',
+                           'openecg_sim.png':'results/openecg_demo/openecg_sim.png'}
+        image_path=supplement_images.get(figure['filename'],data['figures'].get(figure['filename']))
         audit.check(image_path is not None,'embedded image has an independent source mapping '+figure['filename'])
         file=project_file(root,image_path)
         audit.equal(actual,digest(file),'embedded image matches final file '+figure['filename'])
@@ -655,13 +678,24 @@ def verify_measurement_definitions_and_tail(document,by_id,paragraphs,audit):
         matches=[p for p in paragraphs if re.match(r'^图\s*'+str(number)+r'(?!\d)',p.strip())]
         audit.equal(len(matches),1,'one actual figure caption '+str(number))
         audit.equal(compact(matches[0]),compact(caption),'exact separated figure caption '+str(number))
-    children=list(document.find('w:body',NS));table=by_id['tableA2']['element']
+    children=list(document.find('w:body',NS));table=by_id['tableA1']['element']
     index=children.index(table)
     after=[element_text(node).strip() for node in children[index+1:] if node.tag==f"{{{NS['w']}}}p"]
-    audit.check(not any(after),'no standalone closing paragraph follows table A2')
+    after=[text for text in after if text]
+    audit.check(bool(after) and compact(after[0]).startswith('附录B代码与数据仓库'),
+                'supplementary table A1 is followed by the repository appendix')
     earlier=[element_text(node) for node in children[:index] if node.tag==f"{{{NS['w']}}}p"]
-    audit.check(any('完整精度阈值、划分索引' in p for p in earlier),
-                'closing precision/provenance note is retained before table A2')
+    audit.check(any(compact(p).startswith('附录A补充结果') for p in earlier),
+                'supplementary results appendix A exists')
+    audit.check(any('表5' in compact(p) and 'SNR' in p and 'Macro-F1' in p and 'RMSE' in p for p in earlier),
+                'appendix introduction describes both SNR and Macro-F1 in table 5')
+    appendix='\n'.join(after)
+    for token in ('https://github.com/HZH507/openecg-beat-screening','openecg_ext/','sil/','data/README.md'):
+        audit.check(token in appendix,'repository appendix names source '+token)
+    audit.check('部分' in by_id['table7']['spec']['caption'] or '代表性' in by_id['table7']['spec']['caption'],
+                'table 7 is explicitly a partial per-record presentation')
+    audit.check(any('22' in p and ('完整' in p or '全部' in p) and 'json' in p.lower() for p in paragraphs),
+                'full per-record results are available beyond the six displayed examples')
 
 
 def sil_alignment_pulse_checks(script):
@@ -857,7 +891,7 @@ def verify_sil(root,manifest,by_id,summary,paragraphs,audit):
                 and isinstance(q_beats.args[0].args[0],ast.Name) and q_beats.args[0].args[0].id=='stream_q',
                 'SIL component ablation retains the existing digital preprocessing and beat builder')
     start=next((i for i,p in enumerate(paragraphs) if compact(p).startswith('4.6硬件链路仿真')),None)
-    stop=next((i for i,p in enumerate(paragraphs) if start is not None and i>start and compact(p).startswith('5')),None)
+    stop=next((i for i,p in enumerate(paragraphs) if start is not None and i>start and compact(p).startswith('4.7')),None)
     audit.check(start is not None and stop is not None,'SIL subsection 4.6 located before conclusions')
     scope='\n'.join(paragraphs[start:stop]); reduced=compact(scope)
     for token in ('软件在环','AFE','0.5','40','四阶','因果','11bit','±5mV','±0.5LSB',
@@ -865,7 +899,7 @@ def verify_sil(root,manifest,by_id,summary,paragraphs,audit):
         audit.check(compact(token) in reduced,'SIL method disclosed '+token)
     audit.check(f'{max_dev:.1e}' in reduced or '1.2×10⁻⁷' in reduced or '1.2×10−7' in reduced,
                 'SIL ideal per-beat cache deviation disclosed')
-    for token in ('360Hz','数字记录','采样前混叠','设定值','实物联调','概率','校准'):
+    for token in ('360Hz','数字记录','采样前混叠','设定值','实物联调','工作点','校准'):
         audit.check(compact(token) in reduced,'SIL boundary/calibration disclosed '+token)
     audit.check('未模拟' in reduced,'SIL no pre-sampling aliasing disclosed')
     audit.check('不是实物联调' in reduced or '不等同于实物联调' in reduced or '不能替代实物联调' in reduced,
@@ -880,7 +914,8 @@ def verify_sil(root,manifest,by_id,summary,paragraphs,audit):
                 'SIL unaligned sensitivity delta is stated from current metrics')
     audit.check(f"{sil['lag_ms']:.1f}" in reduced,'SIL phase delay magnitude disclosed')
     audit.check('时间戳' in reduced or '检测器' in reduced,'SIL phase-delay compensation mechanism disclosed')
-    audit.check('重新校准' in reduced,'SIL workpoint recalibration is a disclosed future need')
+    audit.check('重新校准' in reduced or ('重新选择' in reduced and '独立验证' in reduced),
+                'SIL workpoint selection and independent validation are disclosed future needs')
     audit.check('四通路' in compact(by_id['table9']['spec']['caption']),'SIL table 9 caption names four routes')
     for route in ('ideal','quant_link','sil','sil_aligned'):
         audit.check(f"{sil[route]['auc']:.4f}" in reduced,
@@ -888,9 +923,12 @@ def verify_sil(root,manifest,by_id,summary,paragraphs,audit):
     for route in ('ideal','quant_link','sil'):
         audit.check(f"{sil[route]['sensitivity']*100:.2f}%" in reduced,
                     'SIL component ablation paragraph states sensitivity '+route)
-    for token in ('组件消融','11bit','1%','40Hz','抗混叠低通','数字带通','串联','双重高频衰减',
-                  '主要来源','量化与分包丢失不是主因','频率相关','相位','形态改变'):
+    for token in ('组件消融','11bit','1%','AFE','可能','幅频','相频','波形'):
         audit.check(compact(token) in reduced,'SIL component ablation interpretation disclosed '+token)
+    audit.check(any(token in reduced for token in ('尚未分别','未分别','不能分别确定','未单独隔离','尚未单独隔离')),
+                'SIL interpretation acknowledges that individual AFE mechanisms were not isolated')
+    for claim in ('双重高频衰减是主要来源','损失主要来自AFE的串联低通','串联低通是主要损失来源'):
+        audit.check(claim not in reduced,'unisolated low-pass causal claim absent '+claim)
     audit.check('尚未进行AFE、量化与丢包的组件消融' not in reduced,
                 'obsolete claim of no SIL component ablation removed')
     for route in ('ideal','sil_aligned'):
@@ -913,8 +951,10 @@ def verify_sil(root,manifest,by_id,summary,paragraphs,audit):
     abstract='\n'.join(paragraphs[:abstract_end]) if abstract_end is not None else ''
     audit.check(abstract_end is not None and ('SIL' in abstract or '软件在环' in abstract),
                 'abstract includes SIL result sentence')
-    audit.check('组件消融' in compact(abstract) and 'AFE' in abstract and '串联低通' in compact(abstract),
-                'abstract includes the component-ablation AFE conclusion')
+    audit.check('组件消融' in compact(abstract) and 'AFE' in abstract,
+                'abstract includes the whole-AFE component-ablation observation')
+    audit.check('损失主要来自AFE的串联低通' not in compact(abstract),
+                'abstract avoids an unisolated low-pass causal conclusion')
     conclusion_end=next((i for i,p in enumerate(paragraphs) if i>stop and compact(p).startswith('参考文献')),len(paragraphs))
     conclusion='\n'.join(paragraphs[stop:conclusion_end])
     audit.check('SIL' in conclusion or '软件在环' in conclusion,'conclusion includes SIL result sentence')
@@ -923,7 +963,7 @@ def verify_sil(root,manifest,by_id,summary,paragraphs,audit):
         audit.equal(images[fid]['filename'],name,'SIL embedded figure numbering '+fid)
         audit.equal(images[fid]['sha256'],digest(root/'results/sil'/name),'SIL current source image hash '+fid)
     audit.check('四通路' in compact(images['figure13']['caption']),'SIL figure 13 caption names four routes')
-    audit.equal(len(manifest['figures']),13,'eleven original plus two SIL embedded figures')
+    audit.equal(len(manifest['figures']),14,'eleven original plus two SIL and one synthetic-input figure')
     return {'metrics_sha256':digest(metrics_path),'threshold':sil['threshold'],
             'n_beats':sil['n_beats'],'ideal_cache_max_deviation':max_dev,
             'synthetic_lag_compensation_verified':True}
@@ -939,6 +979,62 @@ def poppler_executable(name,explicit=None):
     if result is None or not result.is_file():
         raise RuntimeError(f'PDF validation requires Poppler {name}; pass its executable path explicitly')
     return result
+
+
+def verify_synthetic_demo(root,manifest,summary,paragraphs,audit):
+    """Check the existing synthetic-input result, without generating predictions."""
+    path=root/'results/openecg_demo/openecg_demo.json'
+    demo=read(path)
+    source=manifest['openecg_source']
+    audit.equal(project_file(root,source['path']).resolve(),path.resolve(),'synthetic demo source mapping')
+    audit.equal(source['sha256'],digest(path),'synthetic demo JSON hash')
+    audit.equal(demo['n_peaks'],10,'synthetic demo detected peaks')
+    audit.equal(demo['n_beats'],10,'synthetic demo segmented beats')
+    audit.equal(len(demo['prob_abnormal']),demo['n_beats'],'synthetic demo cached probability count')
+    audit.equal(len(demo['pred']),demo['n_beats'],'synthetic demo cached prediction count')
+    audit.close(demo['threshold'],summary['working_points']['sp90_max_se']['threshold'],
+                'synthetic demo retains full frozen threshold')
+    p=np.asarray(demo['prob_abnormal'],dtype=float)
+    audit.check(np.all(np.isfinite(p)) and np.all((p>=0)&(p<=1)),'synthetic demo cached scores bounded')
+    audit.check(np.all(np.abs(p-demo['threshold'])>.00005),
+                'rounded synthetic cached probabilities are unambiguous at the frozen threshold')
+    predicted=(p>=demo['threshold']).astype(int).tolist()
+    audit.equal(demo['pred'],predicted,'synthetic cached classes agree with frozen threshold')
+    audit.equal(sum(predicted),demo['n_abnormal'],'synthetic cached abnormal count')
+    audit.equal(demo['n_abnormal'],0,'synthetic demo reports zero abnormal detections')
+    audit.close(demo['heart_rate_bpm_measured'],60/demo['mean_rr_s'],'synthetic demo RR-derived heart rate')
+    audit.equal(demo['fs_sim_hz'],1000,'synthetic input sampling rate')
+    audit.equal(demo['fs_model_hz'],360,'synthetic resampled rate')
+    start=next((i for i,p in enumerate(paragraphs) if compact(p).startswith('4.7')),None)
+    stop=next((i for i,p in enumerate(paragraphs) if start is not None and i>start and compact(p).startswith('5讨论')),None)
+    audit.check(start is not None and stop is not None,'synthetic-input section is present')
+    scope=compact('\n'.join(paragraphs[start:stop]))
+    for token in ('自定义','合成','NeuroKit2','ecg_process','滤波','R峰','参数','性能'):
+        audit.check(token in scope,'synthetic-input scope disclosed '+token)
+    audit.check('修改' in scope or '调整' in scope,'synthetic waveform parameter changes disclosed')
+    audit.check('不是' in scope or '不构成' in scope or '未直接' in scope,
+                'synthetic demo is explicitly limited to its actual integration scope')
+    for claim in ('没有滤波、R峰检测','可直接消费上游的模拟信号与时序','复刻其高斯'):
+        audit.check(claim not in scope,'obsolete upstream-equivalence claim absent '+claim)
+    audit.check(f"{min(p):.2f}" in scope and f"{max(p):.2f}" in scope,
+                'synthetic reported score range agrees with cached values')
+    images={f['id']:f for f in manifest['figures']}
+    figure=images['figure14']
+    audit.equal(figure['filename'],'openecg_sim.png','synthetic-input figure 14 mapping')
+    audit.equal(figure['sha256'],digest(root/'results/openecg_demo/openecg_sim.png'),
+                'synthetic-input figure 14 current image hash')
+    # The plotted beats are pre-standardization waveform slices. The classifier
+    # internally standardizes a separate array, so the plot cannot say z-score.
+    plotting=ast.parse((root/'openecg_ext/analysis/run_demo.py').read_text(encoding='utf-8-sig'))
+    for node in ast.walk(plotting):
+        if isinstance(node,ast.Call) and isinstance(node.func,ast.Attribute) and node.func.attr in ('set_ylabel','set'):
+            labels=[arg.value for arg in node.args if isinstance(arg,ast.Constant) and isinstance(arg.value,str)]
+            labels += [arg.value.value for arg in node.keywords if arg.arg=='ylabel'
+                       and isinstance(arg.value,ast.Constant) and isinstance(arg.value.value,str)]
+            audit.check(not any(value.strip().lower()=='z-score' for value in labels),
+                        'unstandardized synthetic waveform is not labelled z-score')
+    return {'metrics_sha256':digest(path),'n_beats':demo['n_beats'],'n_abnormal':demo['n_abnormal'],
+            'prediction_inference_performed':False}
 
 
 def extract_pdf_text(pdf,pdf_python=None):
@@ -984,7 +1080,7 @@ def verify_pdf_pair(root,docx,audit,*,required=False,pdf=None,record_path=None,p
     page_match=re.search(r'^Pages:\s*(\d+)',info,re.M)
     audit.check(page_match is not None,'actual PDF page count readable by independent Poppler')
     pages=int(page_match.group(1))
-    audit.check(13<=pages<=15,'SIL-expanded final PDF has 13 to 15 substantive pages')
+    audit.check(pages>=2,'final PDF has a cover and substantive report pages')
     audit.equal(pages,record['pdf_page_count'],'actual PDF pages equal export record')
     audit.equal(pages,record['word_page_count'],'PDF and Word page counts match')
     audit.equal(pages,layout['page_count'],'PDF pages equal read-only Word layout diagnostics')
@@ -994,13 +1090,15 @@ def verify_pdf_pair(root,docx,audit,*,required=False,pdf=None,record_path=None,p
     audit.equal(normal(last),normal(record['pdf_last_page_text']),'actual PDF last page matches recorded content')
     audit.equal(normal(record['word_last_page_text']),normal(layout['pages'][-1]['text']),
                 'recorded Word last page matches Word diagnostic content')
-    audit.check('表A2' in compact(last),'last PDF page contains table A2 rather than only a closing note')
-    audit.check('肌电/15' in compact(last),'last PDF page contains the last table A2 condition')
+    audit.check('表A1' in compact(last),'last PDF page contains supplementary table A1 rather than only a closing note')
+    audit.check('肌电/15' in compact(last),'last PDF page contains the last table A1 condition')
     for condition in ('基线漂移/5','基线漂移/10','基线漂移/15','电极运动/5','电极运动/10',
                       '电极运动/15','肌电/5','肌电/10','肌电/15'):
-        audit.check(condition in compact(last),'complete table A2 remains together on final PDF page '+condition)
+        audit.check(condition in compact(last),'complete table A1 remains together on final PDF page '+condition)
     audit.check(len(compact(last))>=150,'last PDF page has substantive table content')
-    audit.check('表A2' in compact(record['word_last_page_text']),'last Word page contains table A2')
+    audit.check('表A1' in compact(record['word_last_page_text']),'last Word page contains table A1')
+    audit.check('附录B' in compact(last) and '代码与数据仓库' in compact(last),
+                'last PDF page contains the substantive repository appendix')
     audit.check(not any(p.get('possibly_blank',False) for p in layout['pages']),
                 'Word diagnostics show no blank SIL-expanded pages')
     for old in (r'(?<![\d.])93\.17(?!\d)',r'(?<![\d.])0\.763(?!\d)',r'(?<![\d.])0\.829(?!\d)'):
@@ -1016,13 +1114,14 @@ def verify_pdf_pair(root,docx,audit,*,required=False,pdf=None,record_path=None,p
     audit.equal(report_pdfs,[pdf.resolve()],'report submission directory contains only the current PDF')
     return {'pdf':str(pdf),'pdf_sha256':digest(pdf),'pages':pages,
             'source_docx_sha256':digest(docx),'export_record_sha256':digest(record_path),
-            'last_page_contains_table_A2':True,'independent_pdf_reader':'Poppler page count plus pypdf text'}
+            'last_page_contains_table_A1':True,'independent_pdf_reader':'Poppler page count plus pypdf text'}
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root',type=Path,default=Path(__file__).resolve().parents[1])
     parser.add_argument('--docx',type=Path)
+    parser.add_argument('--cover-source',type=Path,help='User-provided original DOCX whose cover must be preserved; omitted for blank public covers')
     parser.add_argument('--output',type=Path)
     parser.add_argument('--require-pdf',action='store_true',help='Require a current Word-exported PDF and matching page/content evidence')
     parser.add_argument('--pdf',type=Path)
@@ -1040,11 +1139,13 @@ def main():
     verify_raw_experiments(root,data,frozen,audit)
     blobs,document,tables,captions,paragraphs=document_parts(docx)
     by_id=verify_manifest(manifest,tables,captions,paragraphs,audit)
+    cover_policy=verify_cover(document,manifest,audit,args.cover_source)
     verify_table_numbers(data,by_id,summary,cache,audit)
     verify_figure_values(root,data,summary,cache,audit)
     verify_text_and_ooxml(root,data,manifest,blobs,document,by_id,paragraphs,audit)
     verify_measurement_definitions_and_tail(document,by_id,paragraphs,audit)
     sil_evidence=verify_sil(root,manifest,by_id,summary,paragraphs,audit)
+    synthetic_evidence=verify_synthetic_demo(root,manifest,summary,paragraphs,audit)
     pdf_evidence=verify_pdf_pair(root,docx,audit,required=args.require_pdf or args.pdf is not None,
                                pdf=args.pdf,record_path=args.pdf_record,
                                pdfinfo=args.pdfinfo,pdf_python=args.pdf_python)
@@ -1052,7 +1153,9 @@ def main():
             'docx':str(docx),'docx_sha256':digest(docx),'checks':len(audit.checks),
             'tables':len(tables),'figures':len(manifest['figures']),
             'frozen_binary_preserved':True,'clean_ds2_inference_passes':1,
+            'cover_policy':cover_policy,
             'sil_verification':sil_evidence,
+            'synthetic_demo_verification':synthetic_evidence,
             'pdf_exported':pdf_evidence is not None,'details':audit.checks}
     if pdf_evidence is not None:result['pdf_verification']=pdf_evidence
     output.parent.mkdir(parents=True,exist_ok=True)

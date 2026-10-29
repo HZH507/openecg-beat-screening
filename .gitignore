@@ -12,10 +12,20 @@ report/CODEX_HANDOFF.md
 report/*.docx
 report/*.pdf
 
-# 可由脚本重算的中间结果
+# 历史中间数组不公开；当前冻结复现材料显式保留
 results/**/*.npz
 results/**/*.csv
-results/report_final/figures/
+!results/workpoint_cv_v2/**/*.npz
+!results/workpoint_cv_v2/**/*.csv
+!results/report_final/*.npz
+!results/report_final/*.csv
+!results/sil/*.npz
+!results/openecg_demo/*.npz
+
+# 本地排版诊断可能含已填写封面，不能进入公开仓库或代码包
+results/report_final/word_layout_diagnostics.json
+results/report_final/word_export_summary.json
+results/report_final/pdf_export_verification.json
 
 # Python
 __pycache__/

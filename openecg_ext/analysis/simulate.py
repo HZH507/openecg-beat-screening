@@ -1,10 +1,11 @@
-"""OpenECG 模拟信号模型（复刻上游 notebook，非上游代码原样拷贝）。
+"""参考 OpenECG 高斯叠加思路的自定义合成信号模型。
 
-参数与波形构成取自 jwlee95/OpenECG 仓库中的
+波形构成参考 jwlee95/OpenECG 仓库中的
 ``심전도_신호를_그리는_코드는.ipynb``：
     采样率 1000 Hz、时长 10 s、心率 60 bpm，
     用高斯函数分别模拟 P、QRS(Q/R/S)、T 波并叠加。
-上游 notebook 未声明许可证，因此这里只复刻其数学描述，不复制其文件。
+本实现调整了 Q/R/S 波宽度、幅值及 T 波位置，并非上游原波形。
+上游 notebook 未声明许可证；这里独立实现数学构成，不复制其文件。
 """
 from __future__ import annotations
 
@@ -20,9 +21,9 @@ def simulate_openecg(duration: float = 10.0,
                      heart_rate_bpm: float = 60.0,
                      noise: float = 0.0,
                      seed: int = 20261029):
-    """生成 OpenECG notebook 同款的合成 ECG。
+    """生成参考高斯叠加思路、参数自定义的合成 ECG。
 
-    返回 ``(t, signal)``，signal 单位为任意幅值（mV 量级）。
+    返回 ``(t, signal)``，signal 为任意幅值，无物理 mV 标定。
     """
     t = np.linspace(0.0, duration, int(fs * duration), endpoint=False)
     sig = np.zeros_like(t)
