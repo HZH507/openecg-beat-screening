@@ -1,0 +1,58 @@
+{
+  "fold": 2,
+  "outer_train_records": [
+    "101",
+    "108",
+    "109",
+    "115",
+    "116",
+    "118",
+    "119",
+    "122",
+    "203",
+    "205",
+    "207",
+    "208",
+    "209",
+    "215",
+    "220",
+    "223",
+    "230"
+  ],
+  "outer_val_records": [
+    "106",
+    "112",
+    "114",
+    "124"
+  ],
+  "inner_train_records": [
+    "101",
+    "108",
+    "109",
+    "116",
+    "118",
+    "122",
+    "207",
+    "208",
+    "209",
+    "215",
+    "220",
+    "223",
+    "230"
+  ],
+  "inner_val_records": [
+    "115",
+    "119",
+    "203",
+    "205"
+  ],
+  "outer_train_n": 40986,
+  "outer_val_n": 8064,
+  "outer_val_abnormal": 664,
+  "selected_epochs": 7,
+  "inner_best_auc": 0.9602728156061912,
+  "outer_oof_auc": 0.888792942038424,
+  "checkpoint_sha256": "80b5dced51aba61c5bf38fe38e721d080f4e4a83ac1150bf43f530b834717289",
+  "predictions_sha256": "fe6ff86b4903721f6a25ee47dc5dedbb18d2c7bc9807bd125f1932fa4cfebd1a",
+  "protocol_sha256": "a3441eedbf08672e7f8c2090f3439cde5fc6cb29f97307dfc6d5846fa71fac5a"
+}

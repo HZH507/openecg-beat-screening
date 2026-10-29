@@ -1,0 +1,11 @@
+{
+  "frozen_at_utc": "2026-10-29T08:51:43.029265+00:00",
+  "model_sha256": {
+    "cnn_light_best.pt": "4f1c27fe26c7b792b951e51a72d48ebdfb78b433ce0f4217a585da3af5a659eb",
+    "mlp_best.pt": "6e3de640a83a6817b231daedbe29fcadb378353c22988f8552b0a53946291715",
+    "denoiser_best.pt": "76c30cb14a5f3390adac7ea06296c1558e251ca5ef58b837fbdb3395d11ab9df"
+  },
+  "aux_split_sha256": "265563dbb3e60ae64c2387b73bffe4c4c5e232373127a54936a9955e938a3392",
+  "binary_sha256": "574d3c86ce8ad269e19ce7c0058e427ceaa36bcd52e2ce4f2173dbb2ffc14f1b",
+  "threshold": 0.5878590941429138
+}

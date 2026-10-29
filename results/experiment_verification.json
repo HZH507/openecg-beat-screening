@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "cached_metrics_verified": true,
+  "frozen_hashes_verified": true,
+  "train_val_records_disjoint": true,
+  "clean_test_n": 49705,
+  "noise_test_n": 9446,
+  "noise_conditions": 9,
+  "figures": 13,
+  "report_unchanged": true,
+  "report_rewrite_awaits_user_confirmation": true
+}

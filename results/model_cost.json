@@ -1,0 +1,17 @@
+{
+  "params_cnn": 9058,
+  "cnn_fp32_kb": 35.3828125,
+  "cnn_int8_kb": 8.845703125,
+  "cnn_ms_per_beat": 0.19668781251311884,
+  "params_denoiser": 46049,
+  "denoiser_fp32_kb": 179.87890625,
+  "denoiser_int8_kb": 44.9697265625,
+  "denoiser_ms_per_beat": 1.0761991406070592,
+  "params_four_class_cnn": 9188,
+  "params_mlp": 41412,
+  "threads": 4,
+  "timing_batch": 128,
+  "timing_repetitions": 10,
+  "timing_input": "seeded synthetic input",
+  "int8_note": "weight-size arithmetic only; no quantized model execution"
+}

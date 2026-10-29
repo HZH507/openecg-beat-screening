@@ -1,0 +1,12 @@
+{
+  "status": "complete",
+  "started_at_utc": "2026-10-29T08:21:45.729653+00:00",
+  "frozen_workpoints_sha256": "70c7796e409e68ae51c8b0ee7431ec8a5b5c9a2c557fdeaac81bbcf609dc6887",
+  "model_sha256": "574d3c86ce8ad269e19ce7c0058e427ceaa36bcd52e2ce4f2173dbb2ffc14f1b",
+  "inference_passes": 1,
+  "exploratory_curve_policy": "探索性分析，仅展示冻结后模型的阈值敏感性，不参与选择工作点",
+  "completed_at_utc": "2026-10-29T08:21:58.913172+00:00",
+  "n": 49705,
+  "auc": 0.8557944527396604,
+  "cached_predictions_sha256": "e85dc8c5e6a2e61090a9d8ce401e515bda005d933bee5cd354230d8c8191c129"
+}

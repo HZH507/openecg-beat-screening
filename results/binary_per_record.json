@@ -1,0 +1,354 @@
+[
+  {
+    "record": "100",
+    "n": 2273,
+    "abnormal": 34,
+    "false_negative": 33,
+    "true_positive": 1,
+    "false_positive": 34,
+    "sensitivity": 0.029411764705882353,
+    "specificity": 0.9848146493970522,
+    "class_counts": {
+      "N": 2239,
+      "S": 33,
+      "V": 1,
+      "F": 0
+    }
+  },
+  {
+    "record": "103",
+    "n": 2084,
+    "abnormal": 2,
+    "false_negative": 2,
+    "true_positive": 0,
+    "false_positive": 6,
+    "sensitivity": 0.0,
+    "specificity": 0.9971181556195965,
+    "class_counts": {
+      "N": 2082,
+      "S": 2,
+      "V": 0,
+      "F": 0
+    }
+  },
+  {
+    "record": "105",
+    "n": 2567,
+    "abnormal": 41,
+    "false_negative": 38,
+    "true_positive": 3,
+    "false_positive": 196,
+    "sensitivity": 0.07317073170731707,
+    "specificity": 0.9224069675376089,
+    "class_counts": {
+      "N": 2526,
+      "S": 0,
+      "V": 41,
+      "F": 0
+    }
+  },
+  {
+    "record": "111",
+    "n": 2124,
+    "abnormal": 1,
+    "false_negative": 0,
+    "true_positive": 1,
+    "false_positive": 734,
+    "sensitivity": 1.0,
+    "specificity": 0.6542628356099859,
+    "class_counts": {
+      "N": 2123,
+      "S": 0,
+      "V": 1,
+      "F": 0
+    }
+  },
+  {
+    "record": "113",
+    "n": 1795,
+    "abnormal": 6,
+    "false_negative": 0,
+    "true_positive": 6,
+    "false_positive": 1747,
+    "sensitivity": 1.0,
+    "specificity": 0.023476802683063163,
+    "class_counts": {
+      "N": 1789,
+      "S": 6,
+      "V": 0,
+      "F": 0
+    }
+  },
+  {
+    "record": "117",
+    "n": 1535,
+    "abnormal": 1,
+    "false_negative": 1,
+    "true_positive": 0,
+    "false_positive": 1282,
+    "sensitivity": 0.0,
+    "specificity": 0.16427640156453716,
+    "class_counts": {
+      "N": 1534,
+      "S": 1,
+      "V": 0,
+      "F": 0
+    }
+  },
+  {
+    "record": "121",
+    "n": 1863,
+    "abnormal": 2,
+    "false_negative": 1,
+    "true_positive": 1,
+    "false_positive": 10,
+    "sensitivity": 0.5,
+    "specificity": 0.9946265448683503,
+    "class_counts": {
+      "N": 1861,
+      "S": 1,
+      "V": 1,
+      "F": 0
+    }
+  },
+  {
+    "record": "123",
+    "n": 1518,
+    "abnormal": 3,
+    "false_negative": 0,
+    "true_positive": 3,
+    "false_positive": 0,
+    "sensitivity": 1.0,
+    "specificity": 1.0,
+    "class_counts": {
+      "N": 1515,
+      "S": 0,
+      "V": 3,
+      "F": 0
+    }
+  },
+  {
+    "record": "200",
+    "n": 2601,
+    "abnormal": 858,
+    "false_negative": 65,
+    "true_positive": 793,
+    "false_positive": 3,
+    "sensitivity": 0.9242424242424242,
+    "specificity": 0.9982788296041308,
+    "class_counts": {
+      "N": 1743,
+      "S": 30,
+      "V": 826,
+      "F": 2
+    }
+  },
+  {
+    "record": "202",
+    "n": 2136,
+    "abnormal": 75,
+    "false_negative": 44,
+    "true_positive": 31,
+    "false_positive": 169,
+    "sensitivity": 0.41333333333333333,
+    "specificity": 0.9180009704027171,
+    "class_counts": {
+      "N": 2061,
+      "S": 55,
+      "V": 19,
+      "F": 1
+    }
+  },
+  {
+    "record": "210",
+    "n": 2650,
+    "abnormal": 227,
+    "false_negative": 57,
+    "true_positive": 170,
+    "false_positive": 59,
+    "sensitivity": 0.748898678414097,
+    "specificity": 0.9756500206355757,
+    "class_counts": {
+      "N": 2423,
+      "S": 22,
+      "V": 195,
+      "F": 10
+    }
+  },
+  {
+    "record": "212",
+    "n": 2748,
+    "abnormal": 0,
+    "false_negative": 0,
+    "true_positive": 0,
+    "false_positive": 1698,
+    "sensitivity": 0.0,
+    "specificity": 0.38209606986899564,
+    "class_counts": {
+      "N": 2748,
+      "S": 0,
+      "V": 0,
+      "F": 0
+    }
+  },
+  {
+    "record": "213",
+    "n": 3251,
+    "abnormal": 610,
+    "false_negative": 277,
+    "true_positive": 333,
+    "false_positive": 20,
+    "sensitivity": 0.5459016393442623,
+    "specificity": 0.9924271109428247,
+    "class_counts": {
+      "N": 2641,
+      "S": 28,
+      "V": 220,
+      "F": 362
+    }
+  },
+  {
+    "record": "214",
+    "n": 2260,
+    "abnormal": 257,
+    "false_negative": 85,
+    "true_positive": 172,
+    "false_positive": 1434,
+    "sensitivity": 0.669260700389105,
+    "specificity": 0.28407388916625065,
+    "class_counts": {
+      "N": 2003,
+      "S": 0,
+      "V": 256,
+      "F": 1
+    }
+  },
+  {
+    "record": "219",
+    "n": 2154,
+    "abnormal": 72,
+    "false_negative": 13,
+    "true_positive": 59,
+    "false_positive": 11,
+    "sensitivity": 0.8194444444444444,
+    "specificity": 0.994716618635927,
+    "class_counts": {
+      "N": 2082,
+      "S": 7,
+      "V": 64,
+      "F": 1
+    }
+  },
+  {
+    "record": "221",
+    "n": 2427,
+    "abnormal": 396,
+    "false_negative": 0,
+    "true_positive": 396,
+    "false_positive": 138,
+    "sensitivity": 1.0,
+    "specificity": 0.9320531757754801,
+    "class_counts": {
+      "N": 2031,
+      "S": 0,
+      "V": 396,
+      "F": 0
+    }
+  },
+  {
+    "record": "222",
+    "n": 2483,
+    "abnormal": 209,
+    "false_negative": 126,
+    "true_positive": 83,
+    "false_positive": 1605,
+    "sensitivity": 0.39712918660287083,
+    "specificity": 0.2941952506596306,
+    "class_counts": {
+      "N": 2274,
+      "S": 209,
+      "V": 0,
+      "F": 0
+    }
+  },
+  {
+    "record": "228",
+    "n": 2053,
+    "abnormal": 365,
+    "false_negative": 9,
+    "true_positive": 356,
+    "false_positive": 370,
+    "sensitivity": 0.9753424657534246,
+    "specificity": 0.7808056872037915,
+    "class_counts": {
+      "N": 1688,
+      "S": 3,
+      "V": 362,
+      "F": 0
+    }
+  },
+  {
+    "record": "231",
+    "n": 1571,
+    "abnormal": 3,
+    "false_negative": 0,
+    "true_positive": 3,
+    "false_positive": 495,
+    "sensitivity": 1.0,
+    "specificity": 0.6843112244897959,
+    "class_counts": {
+      "N": 1568,
+      "S": 1,
+      "V": 2,
+      "F": 0
+    }
+  },
+  {
+    "record": "232",
+    "n": 1780,
+    "abnormal": 1382,
+    "false_negative": 804,
+    "true_positive": 578,
+    "false_positive": 120,
+    "sensitivity": 0.4182344428364689,
+    "specificity": 0.6984924623115578,
+    "class_counts": {
+      "N": 398,
+      "S": 1382,
+      "V": 0,
+      "F": 0
+    }
+  },
+  {
+    "record": "233",
+    "n": 3079,
+    "abnormal": 849,
+    "false_negative": 232,
+    "true_positive": 617,
+    "false_positive": 399,
+    "sensitivity": 0.7267373380447585,
+    "specificity": 0.8210762331838565,
+    "class_counts": {
+      "N": 2230,
+      "S": 7,
+      "V": 831,
+      "F": 11
+    }
+  },
+  {
+    "record": "234",
+    "n": 2753,
+    "abnormal": 53,
+    "false_negative": 43,
+    "true_positive": 10,
+    "false_positive": 1,
+    "sensitivity": 0.18867924528301888,
+    "specificity": 0.9996296296296296,
+    "class_counts": {
+      "N": 2700,
+      "S": 50,
+      "V": 3,
+      "F": 0
+    }
+  }
+]

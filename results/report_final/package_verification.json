@@ -1,0 +1,13 @@
+{
+  "status": "pass",
+  "zip": "D:\\openecg（1）\\report\\ECG_project_code.zip",
+  "bytes": 17855759,
+  "sha256": "52349aab97be62aa96e691a75248eba4f35860954c6e5762d1a68e1bda9c3156",
+  "entry_count": 154,
+  "docx_sha256": "01c4b39779fb01fd20b9f81d80f888cf7b68445d04153c6f7d792dadbf40c367",
+  "all_entries_verified": true,
+  "pdfs_in_zip": 0,
+  "pdf_exported": true,
+  "pdf_sha256": "d792cb4f4a6d58c8c309f892bfdd7007f08a8acc9f21051e93054b2a89e3a7ed",
+  "pdf_pages": 15
+}

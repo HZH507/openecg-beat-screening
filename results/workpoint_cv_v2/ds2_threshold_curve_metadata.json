@@ -1,0 +1,25 @@
+{
+  "label": "探索性分析",
+  "purpose": "探索性分析，仅展示冻结后模型的阈值敏感性，不参与选择工作点",
+  "definition": "every distinct predicted-probability breakpoint plus endpoints and frozen workpoints; positive if probability >= threshold",
+  "rows": 49636,
+  "columns": [
+    "threshold",
+    "sensitivity",
+    "specificity",
+    "accuracy",
+    "macro_f1",
+    "f1_abnormal",
+    "f1_normal",
+    "youden_j",
+    "tp",
+    "fp",
+    "tn",
+    "fn",
+    "n"
+  ],
+  "predictions_sha256": "e85dc8c5e6a2e61090a9d8ce401e515bda005d933bee5cd354230d8c8191c129",
+  "frozen_before_test": true,
+  "not_used_for_workpoint_selection": true,
+  "curve_sha256": "671a96c8c64aa238fba6209606215ae4994f78d9ff98f78526b170fbac514191"
+}

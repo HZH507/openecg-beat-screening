@@ -1,0 +1,32 @@
+# 原始数据与预处理结果体积约 200 MB，不提交；说明见 data/README.md
+data/*
+!data/README.md
+
+# 历史备份与旧稿
+backup_*/
+report/archive/
+report/ECG_project_code.zip
+report/CODEX_HANDOFF.md
+
+# 课程报告含个人信息，不公开
+report/*.docx
+report/*.pdf
+
+# 可由脚本重算的中间结果
+results/**/*.npz
+results/**/*.csv
+results/report_final/figures/
+
+# Python
+__pycache__/
+*.py[cod]
+.pylibs/
+.venv/
+.tmp/
+.pip-cache/
+wheels/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+*.log

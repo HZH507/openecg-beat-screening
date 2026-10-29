@@ -1,0 +1,38 @@
+{
+  "source": "OpenECG simulated ECG (jwlee95/OpenECG notebook model)",
+  "fs_sim_hz": 1000,
+  "fs_model_hz": 360,
+  "duration_s": 10.0,
+  "heart_rate_bpm_target": 60.0,
+  "noise": 0.0,
+  "n_peaks": 10,
+  "n_beats": 10,
+  "heart_rate_bpm_measured": 60.0,
+  "mean_rr_s": 1.0,
+  "threshold": 0.5878590941429138,
+  "prob_abnormal": [
+    0.4091,
+    0.4537,
+    0.4449,
+    0.4466,
+    0.4463,
+    0.4465,
+    0.446,
+    0.4482,
+    0.4403,
+    0.474
+  ],
+  "pred": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "n_abnormal": 0
+}

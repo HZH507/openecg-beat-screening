@@ -1,0 +1,21 @@
+{
+  "accuracy": 0.7513127451966602,
+  "macro_f1": 0.6071223298173355,
+  "sensitivity": 0.663973558575101,
+  "specificity": 0.7620596940735218,
+  "auc": 0.8085252429865707,
+  "confusion_matrix": [
+    [
+      33728,
+      10531
+    ],
+    [
+      1830,
+      3616
+    ]
+  ],
+  "n": 49705,
+  "threshold": 0.56,
+  "abnormal_weight": 3,
+  "protocol_sha256": "eaf3d5237d7c8054119c07fe10a391ea9101bab58d4b7842202fe5348410c85c"
+}

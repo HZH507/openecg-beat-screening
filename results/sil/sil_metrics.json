@@ -1,0 +1,128 @@
+{
+  "n_beats": 49705,
+  "n_abnormal": 5446,
+  "threshold": 0.5878590941429138,
+  "ideal": {
+    "auc": 0.8557944527396604,
+    "accuracy": 0.7929182174831506,
+    "macro_f1": 0.6533349927549374,
+    "sensitivity": 0.7227322805728975,
+    "specificity": 0.801554486093224,
+    "tp": 3936,
+    "fp": 8783,
+    "tn": 35476,
+    "fn": 1510
+  },
+  "quant_link": {
+    "auc": 0.85304984372487,
+    "accuracy": 0.7866210642792476,
+    "macro_f1": 0.6482491634118597,
+    "sensitivity": 0.7275064267352185,
+    "specificity": 0.7938950270001581,
+    "tp": 3962,
+    "fp": 9122,
+    "tn": 35137,
+    "fn": 1484
+  },
+  "sil": {
+    "auc": 0.8456162070631927,
+    "accuracy": 0.8308620863092244,
+    "macro_f1": 0.6730962928396463,
+    "sensitivity": 0.6213734851266985,
+    "specificity": 0.8566393275943875,
+    "tp": 3384,
+    "fp": 6345,
+    "tn": 37914,
+    "fn": 2062
+  },
+  "sil_aligned": {
+    "auc": 0.8435316197082049,
+    "accuracy": 0.8132783422190927,
+    "macro_f1": 0.6577638322585304,
+    "sensitivity": 0.635145060594932,
+    "specificity": 0.8351973609887254,
+    "tp": 3459,
+    "fp": 7294,
+    "tn": 36965,
+    "fn": 1987
+  },
+  "delta_auc_quant_link": -0.0027446090147903446,
+  "delta_auc": -0.010178245676467634,
+  "delta_auc_aligned": -0.012262833031455478,
+  "mean_abs_prob_diff": 0.09413084387779236,
+  "max_abs_prob_diff": 0.9070082902908325,
+  "n_prediction_flip": 5986,
+  "n_prediction_flip_aligned": 5800,
+  "mean_abs_prob_diff_aligned": 0.08838889002799988,
+  "mean_lag_samples": 3.3181818181818183,
+  "alignment_method": "per-record waveform cross-correlation; positive lag shifted left, negative lag shifted right; edge padding",
+  "alignment_scope": "offline reference-assisted SIL analysis; no threshold or model adjustment",
+  "lag_ms": 9.22,
+  "lags": [
+    4,
+    4,
+    3,
+    3,
+    3,
+    3,
+    3,
+    4,
+    3,
+    3,
+    3,
+    4,
+    3,
+    3,
+    3,
+    3,
+    4,
+    3,
+    4,
+    4,
+    3,
+    3
+  ],
+  "ideal_matches_frozen_cache_max_dev": 1.1920928955078125e-07,
+  "link": {
+    "n_packets": 715000,
+    "lost_packets": 7158,
+    "loss_rate": 0.01
+  },
+  "adc": {
+    "bits": 11,
+    "vmin": -5.0,
+    "vmax": 5.0,
+    "lsb_mV": 0.004885197850512946
+  },
+  "afe": {
+    "hp_hz": 0.5,
+    "lp_hz": 40.0,
+    "order": 4,
+    "fs": 360,
+    "note": "源数据已是 360 Hz 数字记录，未模拟采样前混叠"
+  },
+  "probability_summary": {
+    "ideal": {
+      "mean": 0.3813997988410521,
+      "median": 0.2654179036617279,
+      "predicted_positive_rate": 0.25588974952218085
+    },
+    "quant_link": {
+      "mean": 0.3861190411861025,
+      "median": 0.2705651819705963,
+      "predicted_positive_rate": 0.26323307514334576
+    },
+    "sil": {
+      "mean": 0.36771438894007374,
+      "median": 0.2979159653186798,
+      "predicted_positive_rate": 0.19573483552962478
+    },
+    "sil_aligned": {
+      "mean": 0.3880469859232182,
+      "median": 0.31179603934288025,
+      "predicted_positive_rate": 0.21633638466955035
+    }
+  },
+  "predictions_path": "results/sil/sil_predictions.npz",
+  "predictions_sha256": "8cff6985f1a3533e1e3590e93b542e3134d6a9bb34bd2d8b9ddc16d7a9ccaa47"
+}

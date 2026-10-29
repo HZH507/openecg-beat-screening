@@ -1,0 +1,16 @@
+{
+  "status": "pass",
+  "record_sets_disjoint": true,
+  "ds1_train_records": 18,
+  "ds1_val_records": 4,
+  "train_n": 42026,
+  "val_n": 8987,
+  "classifier_training_inference_max_abs_difference": 0.0,
+  "denoiser_output_shape": [
+    8,
+    1,
+    256
+  ],
+  "torch": "2.15.0+cpu",
+  "classification_preprocessing": "per-beat mean/std z-score shared by train/validation/test; fixed original inference mismatch"
+}

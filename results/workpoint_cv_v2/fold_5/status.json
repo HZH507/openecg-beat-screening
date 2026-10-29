@@ -1,0 +1,59 @@
+{
+  "stage": "complete",
+  "fold": 5,
+  "outer_train_records": [
+    "101",
+    "106",
+    "108",
+    "109",
+    "112",
+    "114",
+    "119",
+    "122",
+    "124",
+    "203",
+    "205",
+    "208",
+    "209",
+    "215",
+    "220",
+    "223",
+    "230"
+  ],
+  "outer_val_records": [
+    "115",
+    "116",
+    "118",
+    "207"
+  ],
+  "inner_train_records": [
+    "101",
+    "108",
+    "109",
+    "112",
+    "114",
+    "119",
+    "124",
+    "203",
+    "205",
+    "208",
+    "215",
+    "223",
+    "230"
+  ],
+  "inner_val_records": [
+    "106",
+    "122",
+    "209",
+    "220"
+  ],
+  "outer_train_n": 40547,
+  "outer_val_n": 8503,
+  "outer_val_abnormal": 539,
+  "selected_epochs": 21,
+  "inner_best_auc": 0.6113017106894321,
+  "outer_oof_auc": 0.8048657502359877,
+  "checkpoint_sha256": "7c3c5d4a0918f08d601834db7a12d8b953acf9d7b9456181994eb34295d92469",
+  "predictions_sha256": "871ea545993148be6c69c1e1e1577290f361ec99545b3236744070687bb54bd4",
+  "protocol_sha256": "a3441eedbf08672e7f8c2090f3439cde5fc6cb29f97307dfc6d5846fa71fac5a"
+}

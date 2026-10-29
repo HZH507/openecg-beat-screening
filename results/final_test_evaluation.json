@@ -1,0 +1,17 @@
+{
+  "status": "complete",
+  "started_at_utc": "2026-10-29T07:10:39.398132+00:00",
+  "protocol_sha256": "eaf3d5237d7c8054119c07fe10a391ea9101bab58d4b7842202fe5348410c85c",
+  "model_sha256": {
+    "binary_best.pt": "9e85db51444a75c7c7ee823b504b9ed21b37306474e3f8dab2d01ed04b33f9c0",
+    "cnn_light_best.pt": "396ba8bc4d53363d3a3c345d2fddb87fcc646baa25c4b18f03237c5f4b4ddebf",
+    "denoiser_best.pt": "02704837e9f168902215cde6c7458e01a2a8fe2813292f355c977d8d17ad593f",
+    "mlp_best.pt": "53bca62d0d47b1e2808e71592a264d230519600a1874b39b179f3b49c45bcfbb"
+  },
+  "test_policy": "one frozen suite; clean full DS2 plus predefined 5/10/15dB noise subset; no test-driven tuning",
+  "completed_at_utc": "2026-10-29T07:17:37.948488+00:00",
+  "n": 49705,
+  "noise_conditions": 9,
+  "threshold": 0.56,
+  "report_rewrite_authorized": false
+}

@@ -1,0 +1,15 @@
+{
+  "python": "3.13.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "cpu_threads": 4,
+  "cuda_available": false,
+  "packages": {
+    "torch": "2.15.0+cpu",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "wfdb": "4.3.1",
+    "matplotlib": "3.11.2",
+    "scikit-learn": "1.9.1",
+    "python-docx": "1.2.0"
+  }
+}

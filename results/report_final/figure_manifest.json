@@ -1,0 +1,288 @@
+{
+  "policy": "cached predictions and existing raw signals only; no model inference",
+  "sources": {
+    "D:\\openecg（1）\\results\\report_final\\report_data.json": "a89013f65b6d5ff4c31b813f21f5ce05e4bf8df12ecc137191d04102152a3687",
+    "D:\\openecg（1）\\results\\report_final\\dataset_accounting.json": "ebdc0c25c0609abf6b7d9e7b284e629110ed4614f83345ea8fb16a3283152579",
+    "D:\\openecg（1）\\results\\report_final\\classification_metrics.json": "f0ff12df02bff6bcabc803183d1bbcabe7d2a9ac3ff128f1c0171ffc451649ba",
+    "D:\\openecg（1）\\results\\report_final\\classification_predictions.npz": "dea9a3f42469c224514cffcdf2350eb3ff1d9fb085b423b3d0f4bd4755b4e03c",
+    "D:\\openecg（1）\\results\\report_final\\cnn_light_history.json": "ae8f978b1587fd706d02255570aa7c2e325b0b69abff6526b7f7c466a0a82144",
+    "D:\\openecg（1）\\results\\report_final\\denoiser_history.json": "f960df484d75d3be40cdfb72b2688b44fef658e3211dddcd3017699d26d66ca0",
+    "D:\\openecg（1）\\results\\report_final\\binary_noise_results.json": "7bbec21076ca213bc76c9d09904bb4bbe7a4bc1633caa4d62e2a555cb3afa280",
+    "D:\\openecg（1）\\results\\report_final\\denoising_example.npz": "9dfdb0a5f96da17275cb39c7d89f084135a40445e0c30798e81557ac61ce9021",
+    "D:\\openecg（1）\\results\\report_final\\demo_info.json": "a2a90e43bdf1bf4808d5ab1ffc22fddb41319f68aaa5cefce5eb61f99b4ab461",
+    "D:\\openecg（1）\\results\\report_final\\demo_record208.npz": "98fdbd01729070e5feac2fb6b799d42bb0ce039f6a1e2cc5d09da766eeea90ba",
+    "D:\\openecg（1）\\results\\workpoint_cv_v2\\ds2_summary.json": "9bf25f11d8e6680ecc128ca13eded71a568025617bb8703877ebc54a62dfeab5",
+    "D:\\openecg（1）\\results\\workpoint_cv_v2\\oof_selection.json": "f8627df0739e1edbc8969580c037daf527151d8fa848607cc7a47f7724fc68d3",
+    "D:\\openecg（1）\\results\\workpoint_cv_v2\\frozen_workpoints.json": "70c7796e409e68ae51c8b0ee7431ec8a5b5c9a2c557fdeaac81bbcf609dc6887",
+    "D:\\openecg（1）\\results\\workpoint_cv_v2\\ds2_predictions.npz": "e85dc8c5e6a2e61090a9d8ce401e515bda005d933bee5cd354230d8c8191c129"
+  },
+  "figures": [
+    {
+      "filename": "fig02_beat_examples.png",
+      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig02_beat_examples.png",
+      "sha256": "93d69b9838c95754e15bdf02430c8f4ac3e14d0e01c792c6d6c7517aa9a55193",
+      "sources": [
+        "processed/raw WFDB signals"
+      ],
+      "annotation_values": {
+        "model_inference": false
+      }
+    },
+    {
+      "filename": "fig03_filtering.png",
+      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig03_filtering.png",
+      "sha256": "09898fcca383a543179303f78df440f1c847f160ccf0f5c3211933c12348c191",
+      "sources": [
+        "processed/raw WFDB signals"
+      ],
+      "annotation_values": {
+        "model_inference": false
+      }
+    },
+    {
+      "filename": "fig01_dataset_distribution.png",
+      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig01_dataset_distribution.png",
+      "sha256": "c5de48ec203372ceb103f1e838a2ab930cb18e77090b7eb1b9a479a382a09e76",
+      "sources": [
+        "dataset_accounting.json"
+      ],
+      "annotation_values": {
+        "group_n": [
+          49050,
+          49705,
+          1963,
+          733
+        ],
+        "ds2_counts": {
+          "N": 44259,
+          "S": 1837,
+          "V": 3221,
+          "F": 388
+        },
+        "total": 101451
+      }
+    },
+    {
+      "filename": "fig10_system_integration.png",
+      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig10_system_integration.png",
+      "sha256": "49354c45375006dd1232c1f545aeb67d1f6b67e0a1569d8c70550ccc17823258",
+      "sources": [
+        "experiment_protocol.json",
+        "demo_info.json"
+      ],
+      "annotation_values": {
+        "hardware_tested": false,
+        "offline": true,
+        "demo_task": "four_class"
+      }
+    },
+    {
+      "filename": "fig05_training_curves.png",
+      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig05_training_curves.png",
+      "sha256": "9af3f8078b429bac7f1343f90fb7681a98a2d964a3f6a8ecbec99943985d1d28",
+      "sources": [
+        "cnn_light_history.json",
+        "denoiser_history.json"
+      ],
+      "annotation_values": {
+        "denoiser_train_mse_unit": "standardized",
+        "denoiser_val_mse_unit": "mV^2"
+      }
+    },
+    {
+      "filename": "fig06b_binary_roc.png",
+      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig06b_binary_roc.png",
+      "sha256": "5bb2c7f4ae4fe83a121353ab6da78466448f624f4ba169b56e6a3cac0a724cfe",
+      "sources": [
+        "workpoint_cv_v2/ds2_predictions.npz",
+        "workpoint_cv_v2/ds2_summary.json",
+        "workpoint_cv_v2/oof_selection.json"
+      ],
+      "annotation_values": {
+        "ds2_auc": 0.8557944527396604,
+        "oof_auc": 0.7829259603704146,
+        "primary_threshold": 0.5878590941429138,
+        "confusion_matrix": [
+          [
+            35476,
+            8783
+          ],
+          [
+            1510,
+            3936
+          ]
+        ]
+      }
+    },
+    {
+      "filename": "fig04_denoising_example.png",
+      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig04_denoising_example.png",
+      "sha256": "ffc622f59dd46e8b9b4b7d83e5622780ba367ddab549de3c262ddeb0c53157d4",
+      "sources": [
+        "denoising_example.npz"
+      ],
+      "annotation_values": {
+        "model_inference": false
+      }
+    },
+    {
+      "filename": "fig05b_denoising_snr.png",
+      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig05b_denoising_snr.png",
+      "sha256": "75ba7c3d9e6d22c39a2b5ac36edda378277fcf61209af7264ded90910f7ef739",
+      "sources": [
+        "binary_noise_results.json"
+      ],
+      "annotation_values": {
+        "bw_5": 4.833392344682835,
+        "bw_10": 1.9664992374138421,
+        "bw_15": -2.4249796191357618,
+        "em_5": 3.52314947277341,
+        "em_10": 0.9361080832181461,
+        "em_15": -2.938579654482526,
+        "ma_5": 5.250299745761221,
+        "ma_10": 2.046415630208653,
+        "ma_15": -2.3600803283559273
+      }
+    },
+    {
+      "filename": "fig08_noise_robustness.png",
+      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig08_noise_robustness.png",
+      "sha256": "03e22834386769b4dfffc91fe4a000b4cbeac7dc1d07d5a825799599dfc31bac",
+      "sources": [
+        "binary_noise_results.json",
+        "workpoint_cv_v2/frozen_workpoints.json"
+      ],
+      "annotation_values": {
+        "bw_5": {
+          "raw": 0.4810048941594217,
+          "classical": 0.6939733675170568,
+          "denoised": 0.6509734301406249
+        },
+        "bw_10": {
+          "raw": 0.5975625484731044,
+          "classical": 0.7267275863724392,
+          "denoised": 0.6955758469550644
+        },
+        "bw_15": {
+          "raw": 0.686019028889981,
+          "classical": 0.7339656446130416,
+          "denoised": 0.7162701476420948
+        },
+        "em_5": {
+          "raw": 0.6719560606303461,
+          "classical": 0.6977086533538146,
+          "denoised": 0.6904658308303174
+        },
+        "em_10": {
+          "raw": 0.7261272127381857,
+          "classical": 0.7247164355908835,
+          "denoised": 0.7212911821352002
+        },
+        "em_15": {
+          "raw": 0.7435141208478856,
+          "classical": 0.7280904272875697,
+          "denoised": 0.730729357190952
+        },
+        "ma_5": {
+          "raw": 0.45657125761362405,
+          "classical": 0.5266880917824315,
+          "denoised": 0.585516521190047
+        },
+        "ma_10": {
+          "raw": 0.5767084911357444,
+          "classical": 0.6500221024685775,
+          "denoised": 0.6732922167651285
+        },
+        "ma_15": {
+          "raw": 0.6729723192172423,
+          "classical": 0.7014534097526193,
+          "denoised": 0.7032093804649893
+        }
+      }
+    },
+    {
+      "filename": "fig06_confusion_matrices.png",
+      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig06_confusion_matrices.png",
+      "sha256": "856eb143d3cd61d89d0af922586f2a1119f8fa1809225c4e9f50cbe939cace0a",
+      "sources": [
+        "classification_predictions.npz",
+        "classification_metrics.json"
+      ],
+      "annotation_values": {
+        "cnn": {
+          "accuracy": 0.83882909164068,
+          "macro_f1": 0.383787822894721
+        },
+        "mlp": {
+          "accuracy": 0.8337994165576904,
+          "macro_f1": 0.37401315853184297
+        }
+      }
+    },
+    {
+      "filename": "fig11_openecg_demo.png",
+      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig11_openecg_demo.png",
+      "sha256": "289829ceaf07ade990625b95463ac69603762485018b9cc3737bb1aa13cfa8b1",
+      "sources": [
+        "demo_record208.npz",
+        "demo_info.json"
+      ],
+      "annotation_values": {
+        "task": "four_class",
+        "predictions": [
+          "V",
+          "V",
+          "N",
+          "F",
+          "N",
+          "V",
+          "N",
+          "V",
+          "V",
+          "N",
+          "F",
+          "V",
+          "N"
+        ],
+        "truth": [
+          "V",
+          "V",
+          "N",
+          "F",
+          "N",
+          "V",
+          "N",
+          "V",
+          "V",
+          "N",
+          "F",
+          "V",
+          "N"
+        ],
+        "mismatches": [],
+        "uses_rr": false
+      }
+    },
+    {
+      "filename": "fig07_per_class_f1.png",
+      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig07_per_class_f1.png",
+      "sha256": "3c1cdd95dcf079ba0a1354d8eca046b8a154ba4502f45feb8df9a588333d8371",
+      "sources": [
+        "classification_metrics.json"
+      ],
+      "annotation_values": {}
+    },
+    {
+      "filename": "fig09_cnn_architecture.png",
+      "path": "D:\\openecg（1）\\results\\report_final\\figures\\fig09_cnn_architecture.png",
+      "sha256": "26b6052bfc348fbd24144116300a204ab10b3be833448eb53a9178febe712e33",
+      "sources": [
+        "report_data.json"
+      ],
+      "annotation_values": {
+        "params": 9058
+      }
+    }
+  ],
+  "frozen_binary_unchanged": true
+}

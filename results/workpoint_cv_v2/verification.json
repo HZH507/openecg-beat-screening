@@ -1,0 +1,15 @@
+{
+  "status": "pass",
+  "201_excluded_from_binary_training_and_selection": true,
+  "outer_records_predicted_once_each": true,
+  "inner_auc_epoch_selection": true,
+  "oof_n": 49050,
+  "final_fit_n": 49050,
+  "frozen_before_ds2": true,
+  "ds2_inference_passes": 1,
+  "ds2_n": 49705,
+  "complete_exploratory_curve_rows": 49636,
+  "frozen_workpoint_metrics_verified": true,
+  "previous_results_and_report_unchanged": true,
+  "report_rewrite_awaits_user_confirmation": true
+}

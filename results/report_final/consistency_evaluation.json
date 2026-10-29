@@ -1,0 +1,17 @@
+{
+  "status": "complete",
+  "started_at_utc": "2026-10-29T08:51:43.038383+00:00",
+  "binary_clean_ds2_inference_passes_added": 0,
+  "auxiliary_clean_ds2_passes_each": 1,
+  "noise_conditions": 9,
+  "noise_methods_per_condition": 3,
+  "binary_sha256": "574d3c86ce8ad269e19ce7c0058e427ceaa36bcd52e2ce4f2173dbb2ffc14f1b",
+  "threshold": 0.5878590941429138,
+  "completed_at_utc": "2026-10-29T08:58:24.630194+00:00",
+  "aux_model_sha256": {
+    "cnn_light_best.pt": "4f1c27fe26c7b792b951e51a72d48ebdfb78b433ce0f4217a585da3af5a659eb",
+    "mlp_best.pt": "6e3de640a83a6817b231daedbe29fcadb378353c22988f8552b0a53946291715",
+    "denoiser_best.pt": "76c30cb14a5f3390adac7ea06296c1558e251ca5ef58b837fbdb3395d11ab9df"
+  },
+  "noise_predictions_sha256": "59c217ddb063d3b4a3b616e6f217e8a1ed606956066676ac86ccff52130b2a5a"
+}

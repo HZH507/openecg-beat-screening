@@ -1,0 +1,17 @@
+{
+  "created_at_utc": "2026-10-29T08:39:42.382017+00:00",
+  "seed": 42,
+  "excluded_201_from_all_auxiliary_models": true,
+  "aux_split_sha256": "265563dbb3e60ae64c2387b73bffe4c4c5e232373127a54936a9955e938a3392",
+  "binary_checkpoint": "results/workpoint_cv_v2/final_binary.pt",
+  "binary_sha256": "574d3c86ce8ad269e19ce7c0058e427ceaa36bcd52e2ce4f2173dbb2ffc14f1b",
+  "binary_threshold": 0.5878590941429138,
+  "clean_binary_ds2_policy": "reuse frozen prediction cache; no clean DS2 inference",
+  "auxiliary_policy": "train and select on DS1 minus 201; freeze checkpoints before their single clean DS2 evaluation",
+  "noise_policy": "nine predeclared bw/em/ma x 5/10/15 dB conditions; raw/classical/DnCNN; all use the frozen binary classifier and full-precision primary threshold; no tuning",
+  "noise_subset": "all 5446 DS2 abnormal plus seeded 4000 normal beats; n=9446",
+  "noise_seed_rule": "42 + SNR + {bw:1,em:2,ma:3}[kind]*100",
+  "noise_source_split": "per channel chronological first 65% training/validation; last 35% testing; split before concatenating channels",
+  "noise_source_change": "This revision makes the chronological boundary shared by both channels; prior runs split a concatenated channel bank. No old noise metrics are reused.",
+  "latency_protocol": "FP32 CPU, 4 threads, synthetic batch 128, 5 warmups and 20 timed repetitions; median batch time /128; INT8 numbers are weight-size estimates only"
+}
